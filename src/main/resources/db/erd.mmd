@@ -1,0 +1,100 @@
+%% AssetFlow ERD — generated from schema.sql
+%% Render in Mermaid-supported viewers (e.g. GitHub, VS Code Mermaid extension)
+
+erDiagram
+    organization {
+        bigint id PK
+        varchar name
+        timestamptz created_at
+    }
+
+    role {
+        bigint id PK
+        varchar name UK
+    }
+
+    user {
+        bigint id PK
+        bigint organization_id FK
+        bigint role_id FK
+        varchar email UK
+        varchar password_hash
+        varchar full_name
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    asset_category {
+        bigint id PK
+        bigint organization_id FK
+        varchar name
+        timestamptz created_at
+    }
+
+    asset {
+        bigint id PK
+        bigint organization_id FK
+        bigint category_id FK
+        varchar name
+        text description
+        asset_status status
+        varchar image_url
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    booking {
+        bigint id PK
+        bigint organization_id FK
+        bigint asset_id FK
+        bigint user_id FK
+        bigint approved_by_id FK
+        timestamptz start_time
+        timestamptz end_time
+        booking_status status
+        timestamptz checked_in_at
+        timestamptz checked_out_at
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    maintenance_record {
+        bigint id PK
+        bigint organization_id FK
+        bigint asset_id FK
+        bigint created_by_id FK
+        text description
+        timestamptz started_at
+        timestamptz completed_at
+        timestamptz created_at
+    }
+
+    audit_log {
+        bigint id PK
+        bigint user_id FK
+        bigint organization_id FK
+        varchar action
+        varchar entity_type
+        bigint entity_id
+        jsonb details
+        timestamptz created_at
+    }
+
+    organization ||--o{ user : "has users"
+    organization ||--o{ asset_category : "has categories"
+    organization ||--o{ asset : "has assets"
+    organization ||--o{ booking : "has bookings"
+    organization ||--o{ maintenance_record : "has maintenance"
+    organization ||--o{ audit_log : "has audit logs"
+
+    role ||--o{ user : "assigns"
+
+    asset_category ||--o{ asset : "groups"
+
+    asset ||--o{ booking : "booked in"
+    asset ||--o{ maintenance_record : "maintained in"
+
+    user ||--o{ booking : "creates"
+    user ||--o{ booking : "approves"
+    user ||--o{ audit_log : "generates"
+    user ||--o{ maintenance_record : "created by"
