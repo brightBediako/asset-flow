@@ -25,4 +25,20 @@ public class RoleController {
         Role role = roleService.findById(id);
         return role != null ? ResponseEntity.ok(role) : ResponseEntity.notFound().build();
     }
+
+    @PostMapping
+    public ResponseEntity<Role> create(@RequestBody Role role) {
+        return ResponseEntity.ok(roleService.create(role));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Role> update(@PathVariable Long id, @RequestBody Role role) {
+        Role updated = roleService.update(id, role);
+        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        return roleService.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
 }

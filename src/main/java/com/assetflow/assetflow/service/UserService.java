@@ -33,6 +33,11 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    @Transactional(readOnly = true)
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
     @Transactional
     public User create(User user) {
         if (user.getOrganization() != null && user.getOrganization().getId() != null) {

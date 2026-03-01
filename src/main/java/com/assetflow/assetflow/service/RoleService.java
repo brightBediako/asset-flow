@@ -23,4 +23,24 @@ public class RoleService {
     public Role findById(Long id) {
         return roleRepository.findById(id).orElse(null);
     }
+
+    @Transactional
+    public Role create(Role role) {
+        return roleRepository.save(role);
+    }
+
+    @Transactional
+    public Role update(Long id, Role role) {
+        Role existing = roleRepository.findById(id).orElse(null);
+        if (existing == null) return null;
+        existing.setName(role.getName());
+        return roleRepository.save(existing);
+    }
+
+    @Transactional
+    public boolean delete(Long id) {
+        if (!roleRepository.existsById(id)) return false;
+        roleRepository.deleteById(id);
+        return true;
+    }
 }
