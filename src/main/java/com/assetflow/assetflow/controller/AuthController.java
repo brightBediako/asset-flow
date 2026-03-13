@@ -4,6 +4,9 @@ import com.assetflow.assetflow.dto.LoginRequest;
 import com.assetflow.assetflow.dto.RegisterRequest;
 import com.assetflow.assetflow.entity.User;
 import com.assetflow.assetflow.service.UserService;
+import com.assetflow.assetflow.entity.Organization;
+import com.assetflow.assetflow.entity.Role;
+import com.assetflow.assetflow.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,6 +14,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -20,6 +25,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody LoginRequest request) {
@@ -31,19 +37,24 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
-        if (request.roleId() == null) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        Long roleId = request.roleId();
+        if (roleId == null) {
+            roleId = roleRepository.findByName("User")
+                    .map(Role::getId)
+                    .orElse(null);
+        }
+        if (roleId == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "roleId is required. Create a 'User' role via POST /api/roles first, or send roleId in the request body."));
         }
         User user = new User();
         user.setEmail(request.email());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setFullName(request.fullName());
-        if (request.roleId() != null) {
-            user.setRole(com.assetflow.assetflow.entity.Role.builder().id(request.roleId()).build());
-        }
+        user.setRole(Role.builder().id(roleId).build());
         if (request.organizationId() != null) {
-            user.setOrganization(com.assetflow.assetflow.entity.Organization.builder().id(request.organizationId()).build());
+            user.setOrganization(Organization.builder().id(request.organizationId()).build());
         }
         return ResponseEntity.ok(userService.create(user));
     }
