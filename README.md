@@ -38,7 +38,9 @@ A centralized API for organizations to manage, track, and book shared physical a
    Edit `src/main/resources/application.properties` if needed:
 
    - `spring.datasource.url` – JDBC URL
-   - `spring.datasource.username` / `spring.datasource.password` – DB credentials
+   - `spring.datasource.username` – DB user
+   - `spring.datasource.password` – provided via `DB_PASSWORD` env var (falls back to a local default)
+   - `spring.jpa.hibernate.ddl-auto` – driven by `JPA_DDL_AUTO` env var (`update` in dev, `none`/`validate` in prod)
 
 3. **Run**
 
@@ -53,6 +55,15 @@ A centralized API for organizations to manage, track, and book shared physical a
 Full endpoint list and auth flow: **[API.md](API.md)**  
 
 Postman collection: [postman/AssetFlow-API.postman_collection.json](postman/AssetFlow-API.postman_collection.json)
+
+## Roles and access
+
+- Seed roles in the `role` table (for example): `SUPER_ADMIN`, `ORG_ADMIN`, `USER`.
+- Assign `SUPER_ADMIN` to at least one user; this role can manage roles, users, and organizations.
+- Access rules:
+  - Public: `/api/auth/**` (register, login, me)
+  - `SUPER_ADMIN` only: `/api/roles/**`, `/api/users/**`, `/api/organizations/**`
+  - Authenticated (any role): other `/api/**` endpoints
 
 ## Project structure
 

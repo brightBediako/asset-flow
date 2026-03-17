@@ -4,6 +4,7 @@ import com.assetflow.assetflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,7 +28,13 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/roles").permitAll()
+                        // Read access for any authenticated user; write requires SUPER_ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/roles", "/api/roles/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/users", "/api/users/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/organizations", "/api/organizations/**").authenticated()
+                        .requestMatchers("/api/roles/**").hasAuthority("SUPER_ADMIN")
+                        .requestMatchers("/api/users/**").hasAuthority("SUPER_ADMIN")
+                        .requestMatchers("/api/organizations/**").hasAuthority("SUPER_ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated());
         return http.build();

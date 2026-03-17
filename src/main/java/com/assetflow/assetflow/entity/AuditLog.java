@@ -39,7 +39,7 @@ public class AuditLog {
     private Long entityId;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "details")
     private Map<String, Object> details;
 
     @Column(name = "created_at", nullable = false, updatable = false)

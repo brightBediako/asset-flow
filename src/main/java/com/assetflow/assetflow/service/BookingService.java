@@ -1,6 +1,7 @@
 package com.assetflow.assetflow.service;
 
 import com.assetflow.assetflow.entity.Booking;
+import com.assetflow.assetflow.entity.BookingStatus;
 import com.assetflow.assetflow.repository.AssetRepository;
 import com.assetflow.assetflow.repository.BookingRepository;
 import com.assetflow.assetflow.repository.OrganizationRepository;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -19,6 +21,11 @@ public class BookingService {
     private final OrganizationRepository organizationRepository;
     private final AssetRepository assetRepository;
     private final UserRepository userRepository;
+
+    private static final List<BookingStatus> ACTIVE_STATUSES = List.of(
+            BookingStatus.PENDING,
+            BookingStatus.APPROVED
+    );
 
     @Transactional(readOnly = true)
     public List<Booking> findAll() {
@@ -49,6 +56,11 @@ public class BookingService {
         if (booking.getApprovedBy() != null && booking.getApprovedBy().getId() != null) {
             booking.setApprovedBy(userRepository.findById(booking.getApprovedBy().getId()).orElse(null));
         }
+
+        validateTimeWindow(booking.getStartTime(), booking.getEndTime());
+        ensureNoConflictingBooking(booking.getAsset() != null ? booking.getAsset().getId() : null,
+                booking.getStartTime(), booking.getEndTime());
+
         return bookingRepository.save(booking);
     }
 
@@ -56,7 +68,11 @@ public class BookingService {
     public Booking update(Long id, Booking booking) {
         Booking existing = bookingRepository.findById(id).orElse(null);
         if (existing == null) return null;
-        if (booking.getStatus() != null) existing.setStatus(booking.getStatus());
+
+        if (booking.getStatus() != null) {
+            validateStatusTransition(existing.getStatus(), booking.getStatus());
+            existing.setStatus(booking.getStatus());
+        }
         if (booking.getCheckedInAt() != null) existing.setCheckedInAt(booking.getCheckedInAt());
         if (booking.getCheckedOutAt() != null) existing.setCheckedOutAt(booking.getCheckedOutAt());
         if (booking.getApprovedBy() != null && booking.getApprovedBy().getId() != null) {
@@ -70,5 +86,46 @@ public class BookingService {
         if (!bookingRepository.existsById(id)) return false;
         bookingRepository.deleteById(id);
         return true;
+    }
+
+    private void validateTimeWindow(Instant startTime, Instant endTime) {
+        if (startTime == null || endTime == null) {
+            throw new IllegalArgumentException("startTime and endTime are required");
+        }
+        if (!startTime.isBefore(endTime)) {
+            throw new IllegalArgumentException("startTime must be before endTime");
+        }
+    }
+
+    private void ensureNoConflictingBooking(Long assetId, Instant startTime, Instant endTime) {
+        if (assetId == null) {
+            throw new IllegalArgumentException("asset.id is required");
+        }
+        boolean conflict = bookingRepository
+                .existsByAssetIdAndStatusInAndStartTimeBeforeAndEndTimeAfter(assetId, ACTIVE_STATUSES, endTime, startTime);
+        if (conflict) {
+            throw new IllegalArgumentException("Asset is already booked for the selected time range");
+        }
+    }
+
+    private void validateStatusTransition(BookingStatus current, BookingStatus next) {
+        if (current == next) {
+            return;
+        }
+        switch (current) {
+            case PENDING -> {
+                if (next != BookingStatus.APPROVED && next != BookingStatus.REJECTED) {
+                    throw new IllegalArgumentException("Invalid status transition from PENDING to " + next);
+                }
+            }
+            case APPROVED -> {
+                if (next != BookingStatus.COMPLETED) {
+                    throw new IllegalArgumentException("Invalid status transition from APPROVED to " + next);
+                }
+            }
+            case REJECTED, COMPLETED -> {
+                throw new IllegalArgumentException("Cannot change status once booking is " + current);
+            }
+        }
     }
 }

@@ -2,11 +2,12 @@ package com.assetflow.assetflow.controller;
 
 import com.assetflow.assetflow.dto.LoginRequest;
 import com.assetflow.assetflow.dto.RegisterRequest;
-import com.assetflow.assetflow.entity.User;
-import com.assetflow.assetflow.service.UserService;
 import com.assetflow.assetflow.entity.Organization;
 import com.assetflow.assetflow.entity.Role;
+import com.assetflow.assetflow.entity.User;
 import com.assetflow.assetflow.repository.RoleRepository;
+import com.assetflow.assetflow.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +29,7 @@ public class AuthController {
     private final RoleRepository roleRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<User> login(@RequestBody @Valid LoginRequest request) {
         var auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -37,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request) {
         Long roleId = request.roleId();
         if (roleId == null) {
             roleId = roleRepository.findByName("User")
