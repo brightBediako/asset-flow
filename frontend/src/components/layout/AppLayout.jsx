@@ -18,6 +18,8 @@ export function AppLayout() {
           <Link to="/">Dashboard</Link>
           <Link to="/organizations">Organizations</Link>
           <Link to="/users">Users</Link>
+          <Link to="/assets">Assets</Link>
+          <Link to="/bookings">Bookings</Link>
         </nav>
         <div className="topbar-right">
           <span>{auth?.email}</span>
