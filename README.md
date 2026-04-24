@@ -50,6 +50,34 @@ A centralized API for organizations to manage, track, and book shared physical a
 
    API base URL: **http://localhost:8080**
 
+## Frontend (React)
+
+A frontend app is available in `frontend/`.
+
+1. Install dependencies:
+
+   ```bash
+   cd frontend
+   npm install
+   ```
+
+2. Configure env:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   - `VITE_API_BASE_URL` points to the backend API
+   - `VITE_USE_MOCK_DATA=true` runs UI against local mock data
+
+3. Start frontend:
+
+   ```bash
+   npm run dev
+   ```
+
+   Frontend URL: **http://localhost:5173**
+
 ## API
 
 Full endpoint list and auth flow: **[API.md](API.md)**  
