@@ -17,6 +17,7 @@ export function AppLayout() {
         <nav>
           <Link to="/">Dashboard</Link>
           <Link to="/organizations">Organizations</Link>
+          <Link to="/users">Users</Link>
         </nav>
         <div className="topbar-right">
           <span>{auth?.email}</span>
