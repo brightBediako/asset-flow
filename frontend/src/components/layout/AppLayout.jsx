@@ -15,8 +15,8 @@ export function AppLayout() {
   return (
     <div className="shell">
       <header className="topbar">
-        <h1>AssetFlow</h1>
-        <nav>
+        <h1 className="topbar-brand">AssetFlow</h1>
+        <nav className="topbar-nav">
           <Link to="/home">Home</Link>
           {isAdmin && <Link to="/app">Dashboard</Link>}
           {isUser && <Link to="/app/profile">Profile</Link>}
@@ -29,8 +29,10 @@ export function AppLayout() {
           {isAdmin && <Link to="/app/audit-logs">Audit Logs</Link>}
         </nav>
         <div className="topbar-right">
-          <span>{auth?.email}</span>
-          <button onClick={onLogout}>Logout</button>
+          <span className="topbar-email">{auth?.email}</span>
+          <button className="btn-ghost" onClick={onLogout}>
+            Logout
+          </button>
         </div>
       </header>
       <main className="content">

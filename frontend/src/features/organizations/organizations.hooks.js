@@ -8,10 +8,11 @@ import {
   updateOrganization,
 } from "./organizations.api";
 
-export function useOrganizationsQuery() {
+export function useOrganizationsQuery({ enabled = true } = {}) {
   return useQuery({
     queryKey: ["organizations"],
     queryFn: getOrganizations,
+    enabled,
   });
 }
 

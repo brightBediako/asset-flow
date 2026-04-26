@@ -6,6 +6,7 @@ import { RegisterPage } from "./RegisterPage";
 
 const mockNavigate = vi.fn();
 const mockRegisterUser = vi.fn();
+const mockShowToast = vi.fn();
 
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
@@ -17,6 +18,10 @@ vi.mock("react-router-dom", async () => {
 
 vi.mock("../features/auth/auth.api", () => ({
   registerUser: (...args) => mockRegisterUser(...args),
+}));
+
+vi.mock("../components/ui/useToast", () => ({
+  useToast: () => ({ showToast: mockShowToast }),
 }));
 
 describe("RegisterPage", () => {

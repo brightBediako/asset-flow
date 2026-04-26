@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PublicHeader } from "../components/layout/PublicHeader";
 import { registerUser } from "../features/auth/auth.api";
+import { useToast } from "../components/ui/useToast";
 import { getErrorMessage } from "../lib/errors";
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [accountType, setAccountType] = useState("USER");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,7 +22,9 @@ export function RegisterPage() {
     setIsLoading(true);
     try {
       if (accountType === "ORGANIZATION" && !organizationName.trim()) {
-        setError("Organization name is required.");
+        const message = "Organization name is required.";
+        setError(message);
+        showToast({ message, tone: "error" });
         return;
       }
       await registerUser({
@@ -30,9 +34,12 @@ export function RegisterPage() {
         password,
         organizationName: accountType === "ORGANIZATION" ? organizationName.trim() : undefined,
       });
+      showToast({ message: "Registration successful. Please sign in.", tone: "success" });
       navigate("/login?registered=1");
     } catch (submitError) {
-      setError(getErrorMessage(submitError, "Registration failed."));
+      const message = getErrorMessage(submitError, "Registration failed.");
+      setError(message);
+      showToast({ message, tone: "error" });
     } finally {
       setIsLoading(false);
     }

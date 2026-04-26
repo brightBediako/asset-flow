@@ -24,6 +24,7 @@ export function AssetForm({ initialValues, onSubmit, isSubmitting, submitLabel, 
     register,
     handleSubmit,
     control,
+    setValue,
     setError,
     setFocus,
     formState: { errors },
@@ -36,10 +37,27 @@ export function AssetForm({ initialValues, onSubmit, isSubmitting, submitLabel, 
   const filteredCategories = categories.filter(
     (category) => String(category.organization?.id) === String(selectedOrganizationId),
   );
+  const selectedCategoryId = useWatch({ control, name: "categoryId" });
+  const imageUrlValue = useWatch({ control, name: "imageUrl" });
 
   useEffect(() => {
     applyServerFieldErrors(serverError, setError, ASSET_FIELD_MAP, setFocus);
   }, [serverError, setError, setFocus]);
+
+  useEffect(() => {
+    if (!selectedOrganizationId && selectedCategoryId) {
+      setValue("categoryId", "");
+      return;
+    }
+
+    if (!selectedCategoryId) return;
+    const selectedCategoryExists = filteredCategories.some(
+      (category) => String(category.id) === String(selectedCategoryId),
+    );
+    if (!selectedCategoryExists) {
+      setValue("categoryId", "");
+    }
+  }, [filteredCategories, selectedCategoryId, selectedOrganizationId, setValue]);
 
   return (
     <form className="card" onSubmit={handleSubmit(onSubmit)}>
@@ -51,7 +69,7 @@ export function AssetForm({ initialValues, onSubmit, isSubmitting, submitLabel, 
       </label>
       <label>
         Description
-        <input {...register("description")} />
+        <textarea rows={3} {...register("description")} />
       </label>
       <label>
         Status
@@ -69,6 +87,19 @@ export function AssetForm({ initialValues, onSubmit, isSubmitting, submitLabel, 
         <input {...register("imageUrl")} />
         {errors.imageUrl && <span className="error">{errors.imageUrl.message}</span>}
       </label>
+      {imageUrlValue?.trim() && !errors.imageUrl && (
+        <div>
+          <p>Image Preview</p>
+          <img
+            src={imageUrlValue.trim()}
+            alt="Asset preview"
+            style={{ maxWidth: "240px", maxHeight: "180px", objectFit: "cover", borderRadius: "8px" }}
+            onError={(event) => {
+              event.currentTarget.style.display = "none";
+            }}
+          />
+        </div>
+      )}
       <label>
         Organization
         <select {...register("organizationId")}>
@@ -83,14 +114,16 @@ export function AssetForm({ initialValues, onSubmit, isSubmitting, submitLabel, 
       </label>
       <label>
         Category
-        <select {...register("categoryId")}>
-          <option value="">No category</option>
+        <select {...register("categoryId")} disabled={!selectedOrganizationId}>
+          <option value="">Select category</option>
           {filteredCategories.map((category) => (
             <option key={category.id} value={String(category.id)}>
               {category.name}
             </option>
           ))}
         </select>
+        {!selectedOrganizationId && <span>Select an organization first to view categories.</span>}
+        {errors.categoryId && <span className="error">{errors.categoryId.message}</span>}
       </label>
       <button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : submitLabel}

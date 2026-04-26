@@ -18,7 +18,9 @@ export function PublicHeader() {
           ) : (
             <>
               <Link to="/login">Sign in</Link>
-              <Link to="/register">Register</Link>
+              <Link className="public-nav-cta" to="/register">
+                Register
+              </Link>
             </>
           )}
         </nav>

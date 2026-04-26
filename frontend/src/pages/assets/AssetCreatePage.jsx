@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCreateAssetMutation } from "../../features/assets/assets.hooks";
 import { AssetForm } from "./AssetForm";
 
@@ -29,6 +29,9 @@ export function AssetCreatePage() {
 
   return (
     <>
+      <p>
+        <Link to="/app/assets">Back to assets</Link>
+      </p>
       <AssetForm
         initialValues={initialValues}
         onSubmit={onSubmit}

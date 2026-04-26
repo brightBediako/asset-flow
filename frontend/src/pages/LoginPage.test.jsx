@@ -7,6 +7,7 @@ import { LoginPage } from "./LoginPage";
 const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
 const mockSetAuth = vi.fn();
+const mockShowToast = vi.fn();
 
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
@@ -28,6 +29,10 @@ vi.mock("../lib/auth", async () => {
     setAuth: (...args) => mockSetAuth(...args),
   };
 });
+
+vi.mock("../components/ui/useToast", () => ({
+  useToast: () => ({ showToast: mockShowToast }),
+}));
 
 describe("LoginPage", () => {
   beforeEach(() => {

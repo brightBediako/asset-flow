@@ -33,11 +33,15 @@ export function HomePage() {
           {authenticated ? (
             <>
               <Link to="/app">Open Dashboard</Link>
-              <Link to="/assets">Browse Assets</Link>
+              <Link className="hero-link-secondary" to="/assets">
+                Browse Assets
+              </Link>
             </>
           ) : (
             <>
-              <Link to="/assets">Browse Assets</Link>
+              <Link className="hero-link-secondary" to="/assets">
+                Browse Assets
+              </Link>
               <Link to="/register">Get started</Link>
             </>
           )}
@@ -58,7 +62,9 @@ export function HomePage() {
         <h2>Ready to reserve what you need?</h2>
         <p>Browse available assets and start a booking request in minutes.</p>
         <div className="hero-actions">
-          <Link to="/assets">View all assets</Link>
+          <Link className="hero-link-secondary" to="/assets">
+            View all assets
+          </Link>
           {authenticated ? <Link to="/app/bookings">Manage bookings</Link> : <Link to="/login">Sign in</Link>}
         </div>
       </section>

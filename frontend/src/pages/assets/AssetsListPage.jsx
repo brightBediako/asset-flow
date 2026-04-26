@@ -13,15 +13,15 @@ export function AssetsListPage() {
   const [organizationId, setOrganizationId] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
+  const canManageAssets = isAdminRole();
   const { data, isLoading, isError, error } = useAssetSearchQuery({
-    organizationId,
+    organizationId: canManageAssets ? organizationId : undefined,
     query: searchQuery,
     page,
     size: PAGE_SIZE,
   });
-  const { data: organizations = [] } = useOrganizationsQuery();
+  const { data: organizations = [] } = useOrganizationsQuery({ enabled: canManageAssets });
   const deleteMutation = useDeleteAssetMutation();
-  const canManageAssets = isAdminRole();
   const assets = data?.content ?? [];
 
   async function handleDelete(id) {
@@ -41,23 +41,25 @@ export function AssetsListPage() {
           <Link to="/app/assets/new">Create Asset</Link>
         </p>
       )}
-      <div className="table-filter-row">
-        <select
-          className="table-filter-select"
-          value={organizationId}
-          onChange={(event) => {
-            setOrganizationId(event.target.value);
-            setPage(0);
-          }}
-        >
-          <option value="">All organizations</option>
-          {organizations.map((organization) => (
-            <option key={organization.id} value={String(organization.id)}>
-              {organization.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      {canManageAssets && (
+        <div className="table-filter-row">
+          <select
+            className="table-filter-select"
+            value={organizationId}
+            onChange={(event) => {
+              setOrganizationId(event.target.value);
+              setPage(0);
+            }}
+          >
+            <option value="">All organizations</option>
+            {organizations.map((organization) => (
+              <option key={organization.id} value={String(organization.id)}>
+                {organization.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <input
         className="table-filter-input"
         placeholder="Search by name, status, category, org..."
@@ -75,7 +77,7 @@ export function AssetsListPage() {
               <th>ID</th>
               <th>Name</th>
               <th>Status</th>
-              <th>Organization ID</th>
+              {canManageAssets && <th>Organization ID</th>}
               <th>Category</th>
               {canManageAssets && <th>Actions</th>}
             </tr>
@@ -88,7 +90,7 @@ export function AssetsListPage() {
                 <td>
                   <Badge tone={getAssetStatusTone(asset.status)}>{asset.status}</Badge>
                 </td>
-                <td>{asset.organization?.id}</td>
+                {canManageAssets && <td>{asset.organization?.id}</td>}
                 <td>{asset.category?.name ?? "-"}</td>
                 {canManageAssets && (
                   <td>

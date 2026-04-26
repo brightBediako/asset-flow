@@ -32,11 +32,6 @@ public class DataSeeder {
         return args -> {
             normalizeLegacyUserRole();
 
-            if (userRepository.count() > 0) {
-                log.debug("Users already exist, skipping seed");
-                return;
-            }
-
             Role superAdmin = roleRepository.findByName("SUPER_ADMIN")
                     .orElseGet(() -> roleRepository.save(Role.builder().name("SUPER_ADMIN").build()));
             roleRepository.findByName("ORG_ADMIN")
