@@ -19,6 +19,7 @@ function getLoginRedirectUrl() {
 
 export const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
+  timeout: env.apiTimeoutMs,
   headers: {
     "Content-Type": "application/json",
   },

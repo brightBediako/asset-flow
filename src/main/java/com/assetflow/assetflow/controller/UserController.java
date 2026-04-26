@@ -3,6 +3,9 @@ package com.assetflow.assetflow.controller;
 import com.assetflow.assetflow.entity.User;
 import com.assetflow.assetflow.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +24,16 @@ public class UserController {
                 ? userService.findByOrganizationId(organizationId)
                 : userService.findAll();
         return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<User>> search(
+            @RequestParam(required = false) Long organizationId,
+            @RequestParam(required = false, name = "q") String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        return ResponseEntity.ok(userService.search(organizationId, query, pageable));
     }
 
     @GetMapping("/{id}")

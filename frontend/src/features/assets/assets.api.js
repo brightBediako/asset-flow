@@ -1,7 +1,9 @@
 import { apiClient } from "../../lib/apiClient";
 
-export async function getAssets() {
-  const { data } = await apiClient.get("/assets");
+export async function getAssets({ organizationId } = {}) {
+  const { data } = await apiClient.get("/assets", {
+    params: organizationId ? { organizationId } : {},
+  });
   return data;
 }
 
@@ -22,4 +24,16 @@ export async function updateAsset(id, payload) {
 
 export async function deleteAsset(id) {
   await apiClient.delete(`/assets/${id}`);
+}
+
+export async function searchAssets({ organizationId, query, page = 0, size = 20 } = {}) {
+  const { data } = await apiClient.get("/assets/search", {
+    params: {
+      ...(organizationId ? { organizationId } : {}),
+      ...(query ? { q: query } : {}),
+      page,
+      size,
+    },
+  });
+  return data;
 }

@@ -1,7 +1,9 @@
 import { apiClient } from "../../lib/apiClient";
 
-export async function getBookings() {
-  const { data } = await apiClient.get("/bookings");
+export async function getBookings({ organizationId } = {}) {
+  const { data } = await apiClient.get("/bookings", {
+    params: organizationId ? { organizationId } : {},
+  });
   return data;
 }
 
@@ -22,4 +24,16 @@ export async function updateBooking(id, payload) {
 
 export async function deleteBooking(id) {
   await apiClient.delete(`/bookings/${id}`);
+}
+
+export async function searchBookings({ organizationId, query, page = 0, size = 20 } = {}) {
+  const { data } = await apiClient.get("/bookings/search", {
+    params: {
+      ...(organizationId ? { organizationId } : {}),
+      ...(query ? { q: query } : {}),
+      page,
+      size,
+    },
+  });
+  return data;
 }

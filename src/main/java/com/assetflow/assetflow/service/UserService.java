@@ -5,6 +5,8 @@ import com.assetflow.assetflow.repository.OrganizationRepository;
 import com.assetflow.assetflow.repository.RoleRepository;
 import com.assetflow.assetflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,12 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<User> findByOrganizationId(Long organizationId) {
         return userRepository.findByOrganizationId(organizationId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<User> search(Long organizationId, String query, Pageable pageable) {
+        String normalizedQuery = (query == null || query.isBlank()) ? null : query.trim();
+        return userRepository.search(organizationId, normalizedQuery, pageable);
     }
 
     @Transactional(readOnly = true)

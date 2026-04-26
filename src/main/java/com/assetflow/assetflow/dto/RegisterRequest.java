@@ -16,6 +16,8 @@ public record RegisterRequest(
         @NotBlank(message = "fullName is required")
         String fullName,
 
+        String accountType,
+        String organizationName,
         Long roleId,
         Long organizationId
 ) {

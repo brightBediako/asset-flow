@@ -1,10 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createAsset, deleteAsset, getAssetById, getAssets, updateAsset } from "./assets.api";
+import {
+  createAsset,
+  deleteAsset,
+  getAssetById,
+  getAssets,
+  searchAssets,
+  updateAsset,
+} from "./assets.api";
 
-export function useAssetsQuery() {
+export function useAssetsQuery(filters = {}) {
+  const organizationId = filters.organizationId ? String(filters.organizationId) : "";
   return useQuery({
-    queryKey: ["assets"],
-    queryFn: getAssets,
+    queryKey: ["assets", { organizationId }],
+    queryFn: () => getAssets({ organizationId: organizationId || undefined }),
   });
 }
 
@@ -13,6 +21,21 @@ export function useAssetQuery(id) {
     queryKey: ["assets", id],
     queryFn: () => getAssetById(id),
     enabled: Boolean(id),
+  });
+}
+
+export function useAssetSearchQuery({ organizationId, query, page = 0, size = 20 } = {}) {
+  const normalizedOrg = organizationId ? String(organizationId) : "";
+  const normalizedQuery = query?.trim() ?? "";
+  return useQuery({
+    queryKey: ["assets", "search", { organizationId: normalizedOrg, query: normalizedQuery, page, size }],
+    queryFn: () =>
+      searchAssets({
+        organizationId: normalizedOrg || undefined,
+        query: normalizedQuery || undefined,
+        page,
+        size,
+      }),
   });
 }
 

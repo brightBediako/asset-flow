@@ -3,6 +3,9 @@ package com.assetflow.assetflow.controller;
 import com.assetflow.assetflow.entity.Organization;
 import com.assetflow.assetflow.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +21,15 @@ public class OrganizationController {
     @GetMapping
     public ResponseEntity<List<Organization>> list() {
         return ResponseEntity.ok(organizationService.findAll());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Organization>> search(
+            @RequestParam(required = false, name = "q") String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        return ResponseEntity.ok(organizationService.search(query, pageable));
     }
 
     @GetMapping("/{id}")

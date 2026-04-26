@@ -1,13 +1,23 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { EmptyState, ErrorState, LoadingState } from "../../components/ui/QueryStates";
 import {
   useDeleteOrganizationMutation,
-  useOrganizationsQuery,
+  useOrganizationSearchQuery,
 } from "../../features/organizations/organizations.hooks";
 
+const PAGE_SIZE = 20;
+
 export function OrganizationsListPage() {
-  const { data, isLoading, isError, error } = useOrganizationsQuery();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const { data, isLoading, isError, error } = useOrganizationSearchQuery({
+    query: searchQuery,
+    page,
+    size: PAGE_SIZE,
+  });
   const deleteMutation = useDeleteOrganizationMutation();
+  const organizations = data?.content ?? [];
 
   async function handleDelete(id) {
     const confirmed = globalThis.confirm("Delete this organization?");
@@ -24,8 +34,17 @@ export function OrganizationsListPage() {
       <p>
         <Link to="/app/organizations/new">Create Organization</Link>
       </p>
+      <input
+        className="table-filter-input"
+        placeholder="Search organizations by name or ID..."
+        value={searchQuery}
+        onChange={(event) => {
+          setSearchQuery(event.target.value);
+          setPage(0);
+        }}
+      />
       {deleteMutation.isError && <p className="error">Failed to delete organization.</p>}
-      {data?.length ? (
+      {organizations.length ? (
         <table>
           <thead>
             <tr>
@@ -35,7 +54,7 @@ export function OrganizationsListPage() {
             </tr>
           </thead>
           <tbody>
-            {data.map((organization) => (
+            {organizations.map((organization) => (
               <tr key={organization.id}>
                 <td>{organization.id}</td>
                 <td>{organization.name}</td>
@@ -53,8 +72,24 @@ export function OrganizationsListPage() {
           </tbody>
         </table>
       ) : (
-        <EmptyState message="No organizations found." />
+        <EmptyState
+          message={searchQuery.trim() ? "No organizations match your search." : "No organizations found."}
+        />
       )}
+      <div className="pager">
+        <button onClick={() => setPage((current) => Math.max(0, current - 1))} disabled={page <= 0}>
+          Previous
+        </button>
+        <span>
+          Page {Number(data?.number ?? 0) + 1} of {Math.max(Number(data?.totalPages ?? 1), 1)}
+        </span>
+        <button
+          onClick={() => setPage((current) => current + 1)}
+          disabled={page + 1 >= Number(data?.totalPages ?? 1)}
+        >
+          Next
+        </button>
+      </div>
     </section>
   );
 }

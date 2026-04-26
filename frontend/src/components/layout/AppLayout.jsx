@@ -1,10 +1,11 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { clearAuth, getAuth, isAdminRole } from "../../lib/auth";
+import { clearAuth, getAuth, isAdminRole, hasAnyRole } from "../../lib/auth";
 
 export function AppLayout() {
   const navigate = useNavigate();
   const auth = getAuth();
   const isAdmin = isAdminRole();
+  const isUser = hasAnyRole(["USER"]);
 
   function onLogout() {
     clearAuth();
@@ -18,6 +19,7 @@ export function AppLayout() {
         <nav>
           <Link to="/home">Home</Link>
           <Link to="/app">Dashboard</Link>
+          {isUser && <Link to="/app/profile">Profile</Link>}
           {isAdmin && <Link to="/app/organizations">Organizations</Link>}
           {isAdmin && <Link to="/app/users">Users</Link>}
           <Link to="/app/assets">Assets</Link>

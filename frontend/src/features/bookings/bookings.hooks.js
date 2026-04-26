@@ -4,13 +4,15 @@ import {
   deleteBooking,
   getBookingById,
   getBookings,
+  searchBookings,
   updateBooking,
 } from "./bookings.api";
 
-export function useBookingsQuery() {
+export function useBookingsQuery(filters = {}) {
+  const organizationId = filters.organizationId ? String(filters.organizationId) : "";
   return useQuery({
-    queryKey: ["bookings"],
-    queryFn: getBookings,
+    queryKey: ["bookings", { organizationId }],
+    queryFn: () => getBookings({ organizationId: organizationId || undefined }),
   });
 }
 
@@ -19,6 +21,21 @@ export function useBookingQuery(id) {
     queryKey: ["bookings", id],
     queryFn: () => getBookingById(id),
     enabled: Boolean(id),
+  });
+}
+
+export function useBookingSearchQuery({ organizationId, query, page = 0, size = 20 } = {}) {
+  const normalizedOrg = organizationId ? String(organizationId) : "";
+  const normalizedQuery = query?.trim() ?? "";
+  return useQuery({
+    queryKey: ["bookings", "search", { organizationId: normalizedOrg, query: normalizedQuery, page, size }],
+    queryFn: () =>
+      searchBookings({
+        organizationId: normalizedOrg || undefined,
+        query: normalizedQuery || undefined,
+        page,
+        size,
+      }),
   });
 }
 

@@ -23,3 +23,15 @@ export async function updateUser(id, payload) {
 export async function deleteUser(id) {
   await apiClient.delete(`/users/${id}`);
 }
+
+export async function searchUsers({ organizationId, query, page = 0, size = 20 } = {}) {
+  const { data } = await apiClient.get("/users/search", {
+    params: {
+      ...(organizationId ? { organizationId } : {}),
+      ...(query ? { q: query } : {}),
+      page,
+      size,
+    },
+  });
+  return data;
+}

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { PublicHeader } from "../components/layout/PublicHeader";
 import { login } from "../features/auth/auth.api";
-import { setAuth } from "../lib/auth";
+import { getPostLoginPath, setAuth } from "../lib/auth";
 import { getErrorMessage } from "../lib/errors";
 
 export function LoginPage() {
@@ -22,7 +22,7 @@ export function LoginPage() {
     try {
       const user = await login({ email, password });
       setAuth({ id: user.id, email: user.email, fullName: user.fullName, role: user.role?.name });
-      navigate(redirect || "/app");
+      navigate(redirect || getPostLoginPath(user.role?.name));
     } catch (submitError) {
       setError(getErrorMessage(submitError, "Invalid credentials."));
     } finally {
@@ -38,11 +38,11 @@ export function LoginPage() {
           <h2>Sign in</h2>
           {registered && <p className="success">Account created. Please sign in.</p>}
           <label>
-            Email
+            <span>Email</span>
             <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
           </label>
           <label>
-            Password
+            <span>Password</span>
             <input
               type="password"
               value={password}

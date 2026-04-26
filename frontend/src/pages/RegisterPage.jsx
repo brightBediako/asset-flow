@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PublicHeader } from "../components/layout/PublicHeader";
-import { useRolesQuery } from "../features/roles/roles.hooks";
 import { registerUser } from "../features/auth/auth.api";
 import { getErrorMessage } from "../lib/errors";
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { data: roles = [] } = useRolesQuery();
+  const [accountType, setAccountType] = useState("USER");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [organizationId, setOrganizationId] = useState("");
+  const [organizationName, setOrganizationName] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -20,21 +19,16 @@ export function RegisterPage() {
     setError("");
     setIsLoading(true);
     try {
-      const userRole =
-        roles.find((role) => String(role.name || "").toUpperCase() === "USER") ||
-        roles.find((role) => String(role.name || "").toUpperCase() === "ORG_ADMIN") ||
-        roles[0];
-      if (!userRole?.id) {
-        setError("Roles are not loaded yet. Please try again.");
+      if (accountType === "ORGANIZATION" && !organizationName.trim()) {
+        setError("Organization name is required.");
         return;
       }
-
       await registerUser({
+        accountType,
         fullName: fullName.trim(),
         email: email.trim().toLowerCase(),
         password,
-        roleId: userRole.id,
-        organizationId: organizationId ? Number(organizationId) : undefined,
+        organizationName: accountType === "ORGANIZATION" ? organizationName.trim() : undefined,
       });
       navigate("/login?registered=1");
     } catch (submitError) {
@@ -50,12 +44,38 @@ export function RegisterPage() {
       <div className="auth-wrap">
         <form className="card" onSubmit={onSubmit}>
           <h2>Create account</h2>
+          <div className="auth-switcher">
+            <button
+              type="button"
+              className={accountType === "USER" ? "active" : ""}
+              onClick={() => setAccountType("USER")}
+            >
+              User
+            </button>
+            <button
+              type="button"
+              className={accountType === "ORGANIZATION" ? "active" : ""}
+              onClick={() => setAccountType("ORGANIZATION")}
+            >
+              Organization
+            </button>
+          </div>
           <label>
-            Full Name
+            <span>Full Name</span>
             <input value={fullName} onChange={(event) => setFullName(event.target.value)} required />
           </label>
+          {accountType === "ORGANIZATION" && (
+            <label>
+              <span>Organization Name</span>
+              <input
+                value={organizationName}
+                onChange={(event) => setOrganizationName(event.target.value)}
+                required
+              />
+            </label>
+          )}
           <label>
-            Email
+            <span>Email</span>
             <input
               type="email"
               value={email}
@@ -64,21 +84,13 @@ export function RegisterPage() {
             />
           </label>
           <label>
-            Password
+            <span>Password</span>
             <input
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
               minLength={8}
-            />
-          </label>
-          <label>
-            Organization ID (optional)
-            <input
-              value={organizationId}
-              onChange={(event) => setOrganizationId(event.target.value)}
-              inputMode="numeric"
             />
           </label>
           {error && <p className="error">{error}</p>}

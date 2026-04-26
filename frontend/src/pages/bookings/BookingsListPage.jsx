@@ -1,16 +1,30 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "../../components/ui/Badge";
 import { EmptyState, ErrorState, LoadingState } from "../../components/ui/QueryStates";
-import { useDeleteBookingMutation, useBookingsQuery } from "../../features/bookings/bookings.hooks";
+import { useBookingSearchQuery, useDeleteBookingMutation } from "../../features/bookings/bookings.hooks";
+import { useOrganizationsQuery } from "../../features/organizations/organizations.hooks";
 import { getCurrentUserId, isAdminRole } from "../../lib/auth";
 import { formatDateTime } from "../../lib/format";
 import { getBookingStatusTone } from "../../lib/statusTone";
 
+const PAGE_SIZE = 20;
+
 export function BookingsListPage() {
-  const { data, isLoading, isError, error } = useBookingsQuery();
+  const [organizationId, setOrganizationId] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const { data, isLoading, isError, error } = useBookingSearchQuery({
+    organizationId,
+    query: searchQuery,
+    page,
+    size: PAGE_SIZE,
+  });
+  const { data: organizations = [] } = useOrganizationsQuery();
   const deleteMutation = useDeleteBookingMutation();
   const isAdmin = isAdminRole();
   const currentUserId = getCurrentUserId();
+  const bookings = data?.content ?? [];
 
   function canManageBooking(booking) {
     if (isAdmin) return true;
@@ -32,8 +46,34 @@ export function BookingsListPage() {
       <p>
         <Link to="/app/bookings/new">Create Booking</Link>
       </p>
+      <div className="table-filter-row">
+        <select
+          className="table-filter-select"
+          value={organizationId}
+          onChange={(event) => {
+            setOrganizationId(event.target.value);
+            setPage(0);
+          }}
+        >
+          <option value="">All organizations</option>
+          {organizations.map((organization) => (
+            <option key={organization.id} value={String(organization.id)}>
+              {organization.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <input
+        className="table-filter-input"
+        placeholder="Search by booking ID, user, asset, status..."
+        value={searchQuery}
+        onChange={(event) => {
+          setSearchQuery(event.target.value);
+          setPage(0);
+        }}
+      />
       {deleteMutation.isError && <p className="error">Failed to delete booking.</p>}
-      {data?.length ? (
+      {bookings.length ? (
         <table>
           <thead>
             <tr>
@@ -50,7 +90,7 @@ export function BookingsListPage() {
             </tr>
           </thead>
           <tbody>
-            {data.map((booking) => (
+            {bookings.map((booking) => (
               <tr key={booking.id}>
                 <td>
                   <Link to={`/app/bookings/${booking.id}`}>{booking.id}</Link>
@@ -82,8 +122,24 @@ export function BookingsListPage() {
           </tbody>
         </table>
       ) : (
-        <EmptyState message="No bookings found." />
+        <EmptyState
+          message={searchQuery.trim() ? "No bookings match your search." : "No bookings found."}
+        />
       )}
+      <div className="pager">
+        <button onClick={() => setPage((current) => Math.max(0, current - 1))} disabled={page <= 0}>
+          Previous
+        </button>
+        <span>
+          Page {Number(data?.number ?? 0) + 1} of {Math.max(Number(data?.totalPages ?? 1), 1)}
+        </span>
+        <button
+          onClick={() => setPage((current) => current + 1)}
+          disabled={page + 1 >= Number(data?.totalPages ?? 1)}
+        >
+          Next
+        </button>
+      </div>
     </section>
   );
 }

@@ -3,6 +3,8 @@ package com.assetflow.assetflow.service;
 import com.assetflow.assetflow.entity.Organization;
 import com.assetflow.assetflow.repository.OrganizationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,12 @@ public class OrganizationService {
     @Transactional(readOnly = true)
     public Organization findById(Long id) {
         return organizationRepository.findById(id).orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Organization> search(String query, Pageable pageable) {
+        String normalizedQuery = (query == null || query.isBlank()) ? null : query.trim();
+        return organizationRepository.search(normalizedQuery, pageable);
     }
 
     @Transactional

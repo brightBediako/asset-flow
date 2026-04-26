@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -37,5 +39,48 @@ class AuthIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.details.password").exists());
+    }
+
+    @Test
+    void registerOrganizationAccountAutoCreatesOrganizationAndAssignsOrgAdminRole() throws Exception {
+        String suffix = UUID.randomUUID().toString().substring(0, 8);
+        String email = "org+" + suffix + "@test.com";
+        String organizationName = "Org " + suffix;
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email":"%s",
+                                  "password":"password123",
+                                  "fullName":"Org Owner",
+                                  "accountType":"ORGANIZATION",
+                                  "organizationName":"%s"
+                                }
+                                """.formatted(email, organizationName)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(email))
+                .andExpect(jsonPath("$.role.name").value("ORG_ADMIN"))
+                .andExpect(jsonPath("$.organization.id").isNumber())
+                .andExpect(jsonPath("$.organization.name").value(organizationName));
+    }
+
+    @Test
+    void registerDefaultUserAccountAssignsUserRole() throws Exception {
+        String suffix = UUID.randomUUID().toString().substring(0, 8);
+        String email = "user+" + suffix + "@test.com";
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email":"%s",
+                                  "password":"password123",
+                                  "fullName":"Normal User"
+                                }
+                                """.formatted(email)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(email))
+                .andExpect(jsonPath("$.role.name").value("USER"));
     }
 }

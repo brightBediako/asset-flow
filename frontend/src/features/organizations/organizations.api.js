@@ -23,3 +23,14 @@ export async function updateOrganization(id, payload) {
 export async function deleteOrganization(id) {
   await apiClient.delete(`/organizations/${id}`);
 }
+
+export async function searchOrganizations({ query, page = 0, size = 20 } = {}) {
+  const { data } = await apiClient.get("/organizations/search", {
+    params: {
+      ...(query ? { q: query } : {}),
+      page,
+      size,
+    },
+  });
+  return data;
+}

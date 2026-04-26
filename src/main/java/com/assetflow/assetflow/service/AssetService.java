@@ -5,6 +5,8 @@ import com.assetflow.assetflow.repository.AssetCategoryRepository;
 import com.assetflow.assetflow.repository.AssetRepository;
 import com.assetflow.assetflow.repository.OrganizationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,12 @@ public class AssetService {
     @Transactional(readOnly = true)
     public List<Asset> findByOrganizationId(Long organizationId) {
         return assetRepository.findByOrganizationId(organizationId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Asset> search(Long organizationId, String query, Pageable pageable) {
+        String normalizedQuery = (query == null || query.isBlank()) ? null : query.trim();
+        return assetRepository.search(organizationId, normalizedQuery, pageable);
     }
 
     @Transactional(readOnly = true)

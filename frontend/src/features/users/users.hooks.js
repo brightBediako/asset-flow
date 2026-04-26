@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createUser, deleteUser, getUserById, getUsers, updateUser } from "./users.api";
+import { createUser, deleteUser, getUserById, getUsers, searchUsers, updateUser } from "./users.api";
 
 export function useUsersQuery() {
   return useQuery({
@@ -13,6 +13,21 @@ export function useUserQuery(id) {
     queryKey: ["users", id],
     queryFn: () => getUserById(id),
     enabled: Boolean(id),
+  });
+}
+
+export function useUserSearchQuery({ organizationId, query, page = 0, size = 20 } = {}) {
+  const normalizedOrg = organizationId ? String(organizationId) : "";
+  const normalizedQuery = query?.trim() ?? "";
+  return useQuery({
+    queryKey: ["users", "search", { organizationId: normalizedOrg, query: normalizedQuery, page, size }],
+    queryFn: () =>
+      searchUsers({
+        organizationId: normalizedOrg || undefined,
+        query: normalizedQuery || undefined,
+        page,
+        size,
+      }),
   });
 }
 

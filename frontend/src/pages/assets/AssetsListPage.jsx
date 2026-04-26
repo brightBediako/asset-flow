@@ -1,14 +1,28 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "../../components/ui/Badge";
 import { EmptyState, ErrorState, LoadingState } from "../../components/ui/QueryStates";
-import { useDeleteAssetMutation, useAssetsQuery } from "../../features/assets/assets.hooks";
+import { useAssetSearchQuery, useDeleteAssetMutation } from "../../features/assets/assets.hooks";
+import { useOrganizationsQuery } from "../../features/organizations/organizations.hooks";
 import { isAdminRole } from "../../lib/auth";
 import { getAssetStatusTone } from "../../lib/statusTone";
 
+const PAGE_SIZE = 20;
+
 export function AssetsListPage() {
-  const { data, isLoading, isError, error } = useAssetsQuery();
+  const [organizationId, setOrganizationId] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const { data, isLoading, isError, error } = useAssetSearchQuery({
+    organizationId,
+    query: searchQuery,
+    page,
+    size: PAGE_SIZE,
+  });
+  const { data: organizations = [] } = useOrganizationsQuery();
   const deleteMutation = useDeleteAssetMutation();
   const canManageAssets = isAdminRole();
+  const assets = data?.content ?? [];
 
   async function handleDelete(id) {
     const confirmed = globalThis.confirm("Delete this asset?");
@@ -27,8 +41,34 @@ export function AssetsListPage() {
           <Link to="/app/assets/new">Create Asset</Link>
         </p>
       )}
+      <div className="table-filter-row">
+        <select
+          className="table-filter-select"
+          value={organizationId}
+          onChange={(event) => {
+            setOrganizationId(event.target.value);
+            setPage(0);
+          }}
+        >
+          <option value="">All organizations</option>
+          {organizations.map((organization) => (
+            <option key={organization.id} value={String(organization.id)}>
+              {organization.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <input
+        className="table-filter-input"
+        placeholder="Search by name, status, category, org..."
+        value={searchQuery}
+        onChange={(event) => {
+          setSearchQuery(event.target.value);
+          setPage(0);
+        }}
+      />
       {deleteMutation.isError && <p className="error">Failed to delete asset.</p>}
-      {data?.length ? (
+      {assets.length ? (
         <table>
           <thead>
             <tr>
@@ -41,7 +81,7 @@ export function AssetsListPage() {
             </tr>
           </thead>
           <tbody>
-            {data.map((asset) => (
+            {assets.map((asset) => (
               <tr key={asset.id}>
                 <td>{asset.id}</td>
                 <td>{asset.name}</td>
@@ -63,8 +103,24 @@ export function AssetsListPage() {
           </tbody>
         </table>
       ) : (
-        <EmptyState message="No assets found." />
+        <EmptyState
+          message={searchQuery.trim() ? "No assets match your search." : "No assets found."}
+        />
       )}
+      <div className="pager">
+        <button onClick={() => setPage((current) => Math.max(0, current - 1))} disabled={page <= 0}>
+          Previous
+        </button>
+        <span>
+          Page {Number(data?.number ?? 0) + 1} of {Math.max(Number(data?.totalPages ?? 1), 1)}
+        </span>
+        <button
+          onClick={() => setPage((current) => current + 1)}
+          disabled={page + 1 >= Number(data?.totalPages ?? 1)}
+        >
+          Next
+        </button>
+      </div>
     </section>
   );
 }

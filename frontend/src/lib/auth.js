@@ -42,3 +42,11 @@ export function getCurrentUserId() {
   const auth = getAuth();
   return auth?.id ?? null;
 }
+
+export function getPostLoginPath(role) {
+  const normalized = normalizeRoleName(role);
+  if (normalized === "USER") {
+    return "/app/profile";
+  }
+  return "/app";
+}

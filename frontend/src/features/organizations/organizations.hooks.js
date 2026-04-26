@@ -4,6 +4,7 @@ import {
   deleteOrganization,
   getOrganizationById,
   getOrganizations,
+  searchOrganizations,
   updateOrganization,
 } from "./organizations.api";
 
@@ -19,6 +20,19 @@ export function useOrganizationQuery(id) {
     queryKey: ["organizations", id],
     queryFn: () => getOrganizationById(id),
     enabled: Boolean(id),
+  });
+}
+
+export function useOrganizationSearchQuery({ query, page = 0, size = 20 } = {}) {
+  const normalizedQuery = query?.trim() ?? "";
+  return useQuery({
+    queryKey: ["organizations", "search", { query: normalizedQuery, page, size }],
+    queryFn: () =>
+      searchOrganizations({
+        query: normalizedQuery || undefined,
+        page,
+        size,
+      }),
   });
 }
 

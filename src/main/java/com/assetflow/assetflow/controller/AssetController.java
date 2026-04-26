@@ -3,6 +3,9 @@ package com.assetflow.assetflow.controller;
 import com.assetflow.assetflow.entity.Asset;
 import com.assetflow.assetflow.service.AssetService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +24,16 @@ public class AssetController {
                 ? assetService.findByOrganizationId(organizationId)
                 : assetService.findAll();
         return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Asset>> search(
+            @RequestParam(required = false) Long organizationId,
+            @RequestParam(required = false, name = "q") String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        return ResponseEntity.ok(assetService.search(organizationId, query, pageable));
     }
 
     @GetMapping("/{id}")

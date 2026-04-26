@@ -88,6 +88,18 @@ a {
   gap: 12px;
 }
 
+.auth-switcher {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.auth-switcher button.active {
+  border-color: #111827;
+  background: #111827;
+  color: #fff;
+}
+
 label {
   display: grid;
   gap: 6px;
@@ -150,6 +162,12 @@ td {
   margin: 0;
   font-size: 28px;
   font-weight: 700;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .pager {
@@ -368,4 +386,19 @@ pre {
 .state-message {
   margin: 12px 0;
   color: #374151;
+}
+
+.table-filter-input {
+  width: min(100%, 420px);
+  margin: 0 0 12px;
+  background: #fff;
+}
+
+.table-filter-row {
+  margin-bottom: 10px;
+}
+
+.table-filter-select {
+  width: min(100%, 320px);
+  background: #fff;
 }

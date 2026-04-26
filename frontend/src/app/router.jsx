@@ -18,6 +18,7 @@ import { BookingsListPage } from "../pages/bookings/BookingsListPage";
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
 import { UnauthorizedPage } from "../pages/UnauthorizedPage";
+import { UserProfilePage } from "../pages/UserProfilePage";
 import { MaintenanceRecordCreatePage } from "../pages/maintenance-records/MaintenanceRecordCreatePage";
 import { MaintenanceRecordEditPage } from "../pages/maintenance-records/MaintenanceRecordEditPage";
 import { MaintenanceRecordsListPage } from "../pages/maintenance-records/MaintenanceRecordsListPage";
@@ -62,6 +63,14 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <DashboardPage /> },
+      {
+        path: "profile",
+        element: (
+          <RoleRoute allowedRoles={["USER"]}>
+            <UserProfilePage />
+          </RoleRoute>
+        ),
+      },
       {
         path: "organizations",
         element: (
