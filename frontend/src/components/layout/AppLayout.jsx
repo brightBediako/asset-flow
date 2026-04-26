@@ -18,13 +18,13 @@ export function AppLayout() {
         <h1>AssetFlow</h1>
         <nav>
           <Link to="/home">Home</Link>
-          <Link to="/app">Dashboard</Link>
+          {isAdmin && <Link to="/app">Dashboard</Link>}
           {isUser && <Link to="/app/profile">Profile</Link>}
           {isAdmin && <Link to="/app/organizations">Organizations</Link>}
           {isAdmin && <Link to="/app/users">Users</Link>}
           <Link to="/app/assets">Assets</Link>
           <Link to="/app/asset-booking">Book Assets</Link>
-          <Link to="/app/bookings">Bookings</Link>
+          <Link to="/app/bookings">{isUser ? "My Bookings" : "Bookings"}</Link>
           {isAdmin && <Link to="/app/maintenance-records">Maintenance</Link>}
           {isAdmin && <Link to="/app/audit-logs">Audit Logs</Link>}
         </nav>

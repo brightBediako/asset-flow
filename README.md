@@ -111,7 +111,7 @@ Postman collection: [postman/AssetFlow-API.postman_collection.json](postman/Asse
 1. Set `SPRING_PROFILES_ACTIVE=prod`.
 2. Set `DB_PASSWORD` from a secret manager (do not hardcode).
 3. Set `CORS_ALLOWED_ORIGINS` to your frontend domain(s).
-4. Keep `JPA_DDL_AUTO=validate` in production and manage schema changes via SQL migrations.
+4. Keep `JPA_DDL_AUTO=validate` in production and manage schema changes via Flyway SQL migrations in `src/main/resources/db/migration`.
 5. Put TLS at the reverse proxy/load balancer and set:
    - `SESSION_COOKIE_SECURE=true`
    - `SESSION_COOKIE_SAME_SITE=none` (only when frontend/backend are cross-site over HTTPS)

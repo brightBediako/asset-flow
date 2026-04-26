@@ -26,10 +26,11 @@ export async function deleteBooking(id) {
   await apiClient.delete(`/bookings/${id}`);
 }
 
-export async function searchBookings({ organizationId, query, page = 0, size = 20 } = {}) {
+export async function searchBookings({ organizationId, userId, query, page = 0, size = 20 } = {}) {
   const { data } = await apiClient.get("/bookings/search", {
     params: {
       ...(organizationId ? { organizationId } : {}),
+      ...(userId ? { userId } : {}),
       ...(query ? { q: query } : {}),
       page,
       size,

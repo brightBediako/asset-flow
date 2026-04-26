@@ -24,14 +24,20 @@ export function useBookingQuery(id) {
   });
 }
 
-export function useBookingSearchQuery({ organizationId, query, page = 0, size = 20 } = {}) {
+export function useBookingSearchQuery({ organizationId, userId, query, page = 0, size = 20 } = {}) {
   const normalizedOrg = organizationId ? String(organizationId) : "";
+  const normalizedUser = userId ? String(userId) : "";
   const normalizedQuery = query?.trim() ?? "";
   return useQuery({
-    queryKey: ["bookings", "search", { organizationId: normalizedOrg, query: normalizedQuery, page, size }],
+    queryKey: [
+      "bookings",
+      "search",
+      { organizationId: normalizedOrg, userId: normalizedUser, query: normalizedQuery, page, size },
+    ],
     queryFn: () =>
       searchBookings({
         organizationId: normalizedOrg || undefined,
+        userId: normalizedUser || undefined,
         query: normalizedQuery || undefined,
         page,
         size,

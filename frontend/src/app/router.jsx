@@ -2,7 +2,7 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "../components/layout/AppLayout";
 import { ProtectedRoute } from "../components/layout/ProtectedRoute";
 import { RoleRoute } from "../components/layout/RoleRoute";
-import { DashboardPage } from "../pages/DashboardPage";
+import { AppHomePage } from "../pages/AppHomePage";
 import { HomePage } from "../pages/HomePage";
 import { AssetCreatePage } from "../pages/assets/AssetCreatePage";
 import { AssetEditPage } from "../pages/assets/AssetEditPage";
@@ -62,7 +62,7 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <DashboardPage /> },
+      { index: true, element: <AppHomePage /> },
       {
         path: "profile",
         element: (

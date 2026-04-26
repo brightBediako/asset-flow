@@ -14,16 +14,17 @@ export function BookingsListPage() {
   const [organizationId, setOrganizationId] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
+  const isAdmin = isAdminRole();
+  const currentUserId = getCurrentUserId();
   const { data, isLoading, isError, error } = useBookingSearchQuery({
-    organizationId,
+    organizationId: isAdmin ? organizationId : undefined,
+    userId: isAdmin ? undefined : currentUserId,
     query: searchQuery,
     page,
     size: PAGE_SIZE,
   });
   const { data: organizations = [] } = useOrganizationsQuery();
   const deleteMutation = useDeleteBookingMutation();
-  const isAdmin = isAdminRole();
-  const currentUserId = getCurrentUserId();
   const bookings = data?.content ?? [];
 
   function canManageBooking(booking) {
@@ -42,27 +43,29 @@ export function BookingsListPage() {
 
   return (
     <section>
-      <h2>Bookings</h2>
+      <h2>{isAdmin ? "Bookings" : "My Bookings"}</h2>
       <p>
-        <Link to="/app/bookings/new">Create Booking</Link>
+        <Link to="/app/asset-booking">{isAdmin ? "Create Booking" : "Book an Asset"}</Link>
       </p>
-      <div className="table-filter-row">
-        <select
-          className="table-filter-select"
-          value={organizationId}
-          onChange={(event) => {
-            setOrganizationId(event.target.value);
-            setPage(0);
-          }}
-        >
-          <option value="">All organizations</option>
-          {organizations.map((organization) => (
-            <option key={organization.id} value={String(organization.id)}>
-              {organization.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      {isAdmin && (
+        <div className="table-filter-row">
+          <select
+            className="table-filter-select"
+            value={organizationId}
+            onChange={(event) => {
+              setOrganizationId(event.target.value);
+              setPage(0);
+            }}
+          >
+            <option value="">All organizations</option>
+            {organizations.map((organization) => (
+              <option key={organization.id} value={String(organization.id)}>
+                {organization.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <input
         className="table-filter-input"
         placeholder="Search by booking ID, user, asset, status..."
@@ -78,7 +81,7 @@ export function BookingsListPage() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Organization ID</th>
+              {isAdmin && <th>Organization ID</th>}
               <th>Asset</th>
               <th>User</th>
               <th>Status</th>
@@ -95,7 +98,7 @@ export function BookingsListPage() {
                 <td>
                   <Link to={`/app/bookings/${booking.id}`}>{booking.id}</Link>
                 </td>
-                <td>{booking.organization?.id}</td>
+                {isAdmin && <td>{booking.organization?.id}</td>}
                 <td>{booking.asset?.name}</td>
                 <td>{booking.user?.fullName}</td>
                 <td>

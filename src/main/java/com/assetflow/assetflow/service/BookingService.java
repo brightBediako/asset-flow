@@ -40,9 +40,14 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Booking> search(Long organizationId, String query, Pageable pageable) {
+    public List<Booking> findByUserId(Long userId) {
+        return bookingRepository.findByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Booking> search(Long organizationId, Long userId, String query, Pageable pageable) {
         String normalizedQuery = (query == null || query.isBlank()) ? null : query.trim();
-        return bookingRepository.search(organizationId, normalizedQuery, pageable);
+        return bookingRepository.search(organizationId, userId, normalizedQuery, pageable);
     }
 
     @Transactional(readOnly = true)

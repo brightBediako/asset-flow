@@ -28,6 +28,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             SELECT b
             FROM Booking b
             WHERE (:organizationId IS NULL OR b.organization.id = :organizationId)
+              AND (:userId IS NULL OR b.user.id = :userId)
               AND (
                 :query IS NULL
                 OR LOWER(COALESCE(b.asset.name, '')) LIKE LOWER(CONCAT('%', :query, '%'))
@@ -38,6 +39,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             """)
     Page<Booking> search(
             @Param("organizationId") Long organizationId,
+            @Param("userId") Long userId,
             @Param("query") String query,
             Pageable pageable);
 }

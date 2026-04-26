@@ -1,5 +1,6 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useBookingQuery, useUpdateBookingMutation } from "../../features/bookings/bookings.hooks";
+import { getCurrentUserId, isAdminRole } from "../../lib/auth";
 import { BookingForm } from "./BookingForm";
 import { BookingReadonlySummary } from "./BookingReadonlySummary";
 
@@ -18,6 +19,13 @@ export function BookingEditPage() {
   const navigate = useNavigate();
   const { data, isLoading, isError, error } = useBookingQuery(id);
   const updateMutation = useUpdateBookingMutation();
+  const isAdmin = isAdminRole();
+  const currentUserId = getCurrentUserId();
+
+  function canManageBooking(booking) {
+    if (isAdmin) return true;
+    return String(booking?.user?.id) === String(currentUserId);
+  }
 
   async function onSubmit(values) {
     await updateMutation.mutateAsync({
@@ -34,6 +42,7 @@ export function BookingEditPage() {
 
   if (isLoading) return <p>Loading booking...</p>;
   if (isError) return <p className="error">Failed to load booking: {error.message}</p>;
+  if (!canManageBooking(data)) return <Navigate to="/unauthorized" replace />;
 
   const initialValues = {
     organizationId: String(data?.organization?.id ?? ""),

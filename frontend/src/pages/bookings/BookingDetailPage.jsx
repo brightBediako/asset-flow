@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { useBookingQuery } from "../../features/bookings/bookings.hooks";
 import { getCurrentUserId, isAdminRole } from "../../lib/auth";
 import { BookingReadonlySummary } from "./BookingReadonlySummary";
@@ -16,6 +16,7 @@ export function BookingDetailPage() {
 
   if (isLoading) return <p>Loading booking...</p>;
   if (isError) return <p className="error">Failed to load booking: {error.message}</p>;
+  if (!canManageBooking(data)) return <Navigate to="/unauthorized" replace />;
 
   return (
     <>
