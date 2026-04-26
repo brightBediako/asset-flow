@@ -80,6 +80,39 @@ const state = {
       checkedOutAt: null,
     },
   ],
+  maintenanceRecords: [
+    {
+      id: 1,
+      organization: { id: 1 },
+      asset: { id: 1, name: "Projector A1" },
+      createdBy: { id: 1, fullName: "AssetFlow Admin" },
+      description: "Lens and filter cleaning",
+      startedAt: "2026-04-20T09:00:00.000Z",
+      completedAt: "2026-04-20T11:00:00.000Z",
+    },
+  ],
+  auditLogs: [
+    {
+      id: 1,
+      user: { id: 1, fullName: "AssetFlow Admin" },
+      organization: { id: 1, name: "Acme Industries" },
+      action: "BOOKING_APPROVED",
+      entityType: "BOOKING",
+      entityId: 2,
+      details: { status: "APPROVED" },
+      createdAt: "2026-04-26T09:15:00.000Z",
+    },
+    {
+      id: 2,
+      user: { id: 2, fullName: "Ops Manager" },
+      organization: { id: 1, name: "Acme Industries" },
+      action: "ASSET_UPDATED",
+      entityType: "ASSET",
+      entityId: 1,
+      details: { status: "IN_USE" },
+      createdAt: "2026-04-26T10:45:00.000Z",
+    },
+  ],
 };
 
 const wait = (ms = 200) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -279,6 +312,79 @@ export const mockApi = {
       const index = state.bookings.findIndex((item) => String(item.id) === String(id));
       if (index < 0) throw new Error("Booking not found");
       state.bookings.splice(index, 1);
+    },
+  },
+  maintenanceRecords: {
+    async list() {
+      await wait();
+      return [...state.maintenanceRecords];
+    },
+    async get(id) {
+      await wait();
+      const record = state.maintenanceRecords.find((item) => String(item.id) === String(id));
+      if (!record) throw new Error("Maintenance record not found");
+      return { ...record };
+    },
+    async create(payload) {
+      await wait();
+      const asset = state.assets.find((item) => String(item.id) === String(payload.asset?.id));
+      const createdBy = state.users.find((item) => String(item.id) === String(payload.createdBy?.id));
+      const record = {
+        id: nextId(state.maintenanceRecords),
+        organization: { id: Number(payload.organization?.id) },
+        asset: asset ? { id: asset.id, name: asset.name } : { id: Number(payload.asset?.id), name: "Asset" },
+        createdBy: createdBy
+          ? { id: createdBy.id, fullName: createdBy.fullName }
+          : payload.createdBy
+            ? { id: Number(payload.createdBy.id), fullName: "User" }
+            : null,
+        description: payload.description,
+        startedAt: payload.startedAt,
+        completedAt: payload.completedAt ?? null,
+      };
+      state.maintenanceRecords.push(record);
+      return { ...record };
+    },
+    async update(id, payload) {
+      await wait();
+      const index = state.maintenanceRecords.findIndex((item) => String(item.id) === String(id));
+      if (index < 0) throw new Error("Maintenance record not found");
+      const updated = {
+        ...state.maintenanceRecords[index],
+        description: payload.description ?? state.maintenanceRecords[index].description,
+        completedAt: payload.completedAt ?? state.maintenanceRecords[index].completedAt,
+      };
+      state.maintenanceRecords[index] = updated;
+      return { ...updated };
+    },
+    async remove(id) {
+      await wait();
+      const index = state.maintenanceRecords.findIndex((item) => String(item.id) === String(id));
+      if (index < 0) throw new Error("Maintenance record not found");
+      state.maintenanceRecords.splice(index, 1);
+    },
+  },
+  auditLogs: {
+    async list(organizationId, page = 0, size = 20) {
+      await wait();
+      const filtered = state.auditLogs.filter(
+        (log) => String(log.organization?.id) === String(organizationId),
+      );
+      const start = page * size;
+      const content = filtered.slice(start, start + size);
+      return {
+        content,
+        number: page,
+        size,
+        totalElements: filtered.length,
+        totalPages: Math.max(1, Math.ceil(filtered.length / size)),
+      };
+    },
+    async get(id) {
+      await wait();
+      const log = state.auditLogs.find((item) => String(item.id) === String(id));
+      if (!log) throw new Error("Audit log not found");
+      return { ...log };
     },
   },
   organizations: {

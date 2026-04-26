@@ -123,3 +123,76 @@ td {
   font-size: 28px;
   font-weight: 700;
 }
+
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.hero {
+  max-width: 860px;
+  margin: 60px auto;
+  text-align: center;
+  padding: 24px;
+}
+
+.hero-kicker {
+  margin: 0;
+  color: #4b5563;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  margin: 10px 0 12px;
+  font-size: 42px;
+  line-height: 1.1;
+}
+
+.hero-subtitle {
+  margin: 0 auto;
+  max-width: 700px;
+  color: #4b5563;
+}
+
+.hero-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.hero-actions a,
+.asset-book-link {
+  display: inline-block;
+  padding: 9px 14px;
+  background: #0b57d0;
+  border-radius: 6px;
+  color: #fff;
+}
+
+.asset-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.asset-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.asset-card h3 {
+  margin: 0 0 8px;
+}

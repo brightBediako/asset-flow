@@ -1,18 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useCreateBookingMutation } from "../../features/bookings/bookings.hooks";
 import { BookingForm } from "./BookingForm";
-
-const initialValues = {
-  organizationId: "",
-  assetId: "",
-  userId: "",
-  approvedById: "",
-  startTime: "",
-  endTime: "",
-  status: "PENDING",
-  checkedInAt: "",
-  checkedOutAt: "",
-};
 
 function toIsoOrNull(value) {
   if (!value) return null;
@@ -21,7 +9,19 @@ function toIsoOrNull(value) {
 
 export function BookingCreatePage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const createMutation = useCreateBookingMutation();
+  const initialValues = {
+    organizationId: searchParams.get("organizationId") ?? "",
+    assetId: searchParams.get("assetId") ?? "",
+    userId: "",
+    approvedById: "",
+    startTime: "",
+    endTime: "",
+    status: "PENDING",
+    checkedInAt: "",
+    checkedOutAt: "",
+  };
 
   async function onSubmit(values) {
     await createMutation.mutateAsync({

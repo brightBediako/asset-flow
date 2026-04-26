@@ -15,11 +15,15 @@ export function AppLayout() {
       <header className="topbar">
         <h1>AssetFlow</h1>
         <nav>
+          <Link to="/home">Home</Link>
           <Link to="/">Dashboard</Link>
           <Link to="/organizations">Organizations</Link>
           <Link to="/users">Users</Link>
           <Link to="/assets">Assets</Link>
+          <Link to="/asset-booking">Book Assets</Link>
           <Link to="/bookings">Bookings</Link>
+          <Link to="/maintenance-records">Maintenance</Link>
+          <Link to="/audit-logs">Audit Logs</Link>
         </nav>
         <div className="topbar-right">
           <span>{auth?.email}</span>
