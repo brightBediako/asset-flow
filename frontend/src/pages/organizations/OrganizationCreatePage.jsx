@@ -22,6 +22,7 @@ export function OrganizationCreatePage() {
         onSubmit={onSubmit}
         isSubmitting={createMutation.isPending}
         submitLabel="Create Organization"
+        serverError={createMutation.error}
       />
       {createMutation.isError && (
         <p className="error">Failed to create organization: {createMutation.error.message}</p>

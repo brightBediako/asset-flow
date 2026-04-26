@@ -1,9 +1,10 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { clearAuth, getAuth } from "../../lib/auth";
+import { clearAuth, getAuth, isAdminRole } from "../../lib/auth";
 
 export function AppLayout() {
   const navigate = useNavigate();
   const auth = getAuth();
+  const isAdmin = isAdminRole();
 
   function onLogout() {
     clearAuth();
@@ -17,13 +18,13 @@ export function AppLayout() {
         <nav>
           <Link to="/home">Home</Link>
           <Link to="/app">Dashboard</Link>
-          <Link to="/app/organizations">Organizations</Link>
-          <Link to="/app/users">Users</Link>
+          {isAdmin && <Link to="/app/organizations">Organizations</Link>}
+          {isAdmin && <Link to="/app/users">Users</Link>}
           <Link to="/app/assets">Assets</Link>
           <Link to="/app/asset-booking">Book Assets</Link>
           <Link to="/app/bookings">Bookings</Link>
-          <Link to="/app/maintenance-records">Maintenance</Link>
-          <Link to="/app/audit-logs">Audit Logs</Link>
+          {isAdmin && <Link to="/app/maintenance-records">Maintenance</Link>}
+          {isAdmin && <Link to="/app/audit-logs">Audit Logs</Link>}
         </nav>
         <div className="topbar-right">
           <span>{auth?.email}</span>

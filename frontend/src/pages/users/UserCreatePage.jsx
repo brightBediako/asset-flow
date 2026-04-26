@@ -40,6 +40,7 @@ export function UserCreatePage() {
         isSubmitting={createMutation.isPending}
         submitLabel="Create User"
         requirePassword
+        serverError={createMutation.error}
       />
       {localError && <p className="error">{localError}</p>}
       {createMutation.isError && <p className="error">Failed to create user: {createMutation.error.message}</p>}

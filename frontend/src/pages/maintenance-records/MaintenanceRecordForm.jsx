@@ -1,11 +1,31 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useAssetsQuery } from "../../features/assets/assets.hooks";
 import { maintenanceRecordSchema } from "../../features/maintenance-records/maintenanceRecords.schema";
 import { useOrganizationsQuery } from "../../features/organizations/organizations.hooks";
 import { useUsersQuery } from "../../features/users/users.hooks";
+import { applyServerFieldErrors } from "../../lib/formErrors";
 
-export function MaintenanceRecordForm({ initialValues, onSubmit, isSubmitting, submitLabel }) {
+const MAINTENANCE_FIELD_MAP = {
+  organization: "organizationId",
+  "organization.id": "organizationId",
+  asset: "assetId",
+  "asset.id": "assetId",
+  createdBy: "createdById",
+  "createdBy.id": "createdById",
+  description: "description",
+  startedAt: "startedAt",
+  completedAt: "completedAt",
+};
+
+export function MaintenanceRecordForm({
+  initialValues,
+  onSubmit,
+  isSubmitting,
+  submitLabel,
+  serverError,
+}) {
   const { data: organizations = [] } = useOrganizationsQuery();
   const { data: assets = [] } = useAssetsQuery();
   const { data: users = [] } = useUsersQuery();
@@ -13,6 +33,8 @@ export function MaintenanceRecordForm({ initialValues, onSubmit, isSubmitting, s
     register,
     handleSubmit,
     control,
+    setError,
+    setFocus,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(maintenanceRecordSchema),
@@ -26,6 +48,10 @@ export function MaintenanceRecordForm({ initialValues, onSubmit, isSubmitting, s
   const filteredUsers = users.filter(
     (user) => String(user.organization?.id) === String(selectedOrganizationId),
   );
+
+  useEffect(() => {
+    applyServerFieldErrors(serverError, setError, MAINTENANCE_FIELD_MAP, setFocus);
+  }, [serverError, setError, setFocus]);
 
   return (
     <form className="card" onSubmit={handleSubmit(onSubmit)}>

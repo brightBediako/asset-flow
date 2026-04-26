@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Badge } from "../../components/ui/Badge";
+import { EmptyState, ErrorState, LoadingState } from "../../components/ui/QueryStates";
 import { useAuditLogsQuery } from "../../features/audit-logs/auditLogs.hooks";
 import { useOrganizationsQuery } from "../../features/organizations/organizations.hooks";
+import { formatDateTime } from "../../lib/format";
+import { getAuditActionTone } from "../../lib/statusTone";
 
 const PAGE_SIZE = 20;
 
@@ -21,7 +25,7 @@ export function AuditLogsListPage() {
     <section>
       <h2>Audit Logs</h2>
       <label>
-        Organization
+        Organization{" "}
         <select
           value={organizationId}
           onChange={(event) => {
@@ -38,9 +42,9 @@ export function AuditLogsListPage() {
         </select>
       </label>
 
-      {!organizationId && <p>Select an organization to load audit logs.</p>}
-      {organizationId && isLoading && <p>Loading audit logs...</p>}
-      {organizationId && isError && <p className="error">Failed to load audit logs: {error.message}</p>}
+      {!organizationId && <EmptyState message="Select an organization to load audit logs." />}
+      {organizationId && isLoading && <LoadingState message="Loading audit logs..." />}
+      {organizationId && isError && <ErrorState error={error} fallback="Failed to load audit logs." />}
 
       {organizationId && !isLoading && !isError && (
         <>
@@ -61,11 +65,13 @@ export function AuditLogsListPage() {
                 {logs.map((log) => (
                   <tr key={log.id}>
                     <td>{log.id}</td>
-                    <td>{log.action}</td>
+                    <td>
+                      <Badge tone={getAuditActionTone(log.action)}>{log.action}</Badge>
+                    </td>
                     <td>{log.entityType}</td>
                     <td>{log.entityId ?? "-"}</td>
                     <td>{log.user?.fullName ?? "-"}</td>
-                    <td>{log.createdAt}</td>
+                    <td>{formatDateTime(log.createdAt)}</td>
                     <td>
                       <Link to={`/app/audit-logs/${log.id}`}>View</Link>
                     </td>
@@ -74,7 +80,7 @@ export function AuditLogsListPage() {
               </tbody>
             </table>
           ) : (
-            <p>No audit logs found for this organization.</p>
+            <EmptyState message="No audit logs found for this organization." />
           )}
 
           <div className="pager">

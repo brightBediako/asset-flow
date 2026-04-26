@@ -23,9 +23,9 @@ class AuthIntegrationTest {
     void loginWithSeededAdminReturns200AndUser() throws Exception {
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"admin@assetflow.local\",\"password\":\"Admin123!\"}"))
+                        .content("{\"email\":\"admin@gmail.com\",\"password\":\"admin123\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("admin@assetflow.local"))
+                .andExpect(jsonPath("$.email").value("admin@gmail.com"))
                 .andExpect(jsonPath("$.role.name").value("SUPER_ADMIN"));
     }
 

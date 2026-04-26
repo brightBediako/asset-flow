@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
-import { useDeleteOrganizationMutation } from "../../features/organizations/organizations.hooks";
-import { useOrganizationsQuery } from "../../features/organizations/organizations.hooks";
+import { EmptyState, ErrorState, LoadingState } from "../../components/ui/QueryStates";
+import {
+  useDeleteOrganizationMutation,
+  useOrganizationsQuery,
+} from "../../features/organizations/organizations.hooks";
 
 export function OrganizationsListPage() {
   const { data, isLoading, isError, error } = useOrganizationsQuery();
@@ -12,8 +15,8 @@ export function OrganizationsListPage() {
     await deleteMutation.mutateAsync(id);
   }
 
-  if (isLoading) return <p>Loading organizations...</p>;
-  if (isError) return <p className="error">Failed to load organizations: {error.message}</p>;
+  if (isLoading) return <LoadingState message="Loading organizations..." />;
+  if (isError) return <ErrorState error={error} fallback="Failed to load organizations." />;
 
   return (
     <section>
@@ -50,7 +53,7 @@ export function OrganizationsListPage() {
           </tbody>
         </table>
       ) : (
-        <p>No organizations found.</p>
+        <EmptyState message="No organizations found." />
       )}
     </section>
   );

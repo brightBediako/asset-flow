@@ -45,6 +45,7 @@ export function AssetEditPage() {
         onSubmit={onSubmit}
         isSubmitting={updateMutation.isPending}
         submitLabel="Update Asset"
+        serverError={updateMutation.error}
       />
       {updateMutation.isError && <p className="error">Failed to update asset: {updateMutation.error.message}</p>}
     </>

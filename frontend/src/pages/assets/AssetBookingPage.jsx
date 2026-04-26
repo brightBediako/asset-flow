@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
+import { Badge } from "../../components/ui/Badge";
+import { EmptyState, ErrorState, LoadingState } from "../../components/ui/QueryStates";
 import { useAssetsQuery } from "../../features/assets/assets.hooks";
+import { getAssetStatusTone } from "../../lib/statusTone";
 
 export function AssetBookingPage() {
   const { data, isLoading, isError, error } = useAssetsQuery();
 
-  if (isLoading) return <p>Loading assets...</p>;
-  if (isError) return <p className="error">Failed to load assets: {error.message}</p>;
+  if (isLoading) return <LoadingState message="Loading assets..." />;
+  if (isError) return <ErrorState error={error} fallback="Failed to load assets." />;
 
   return (
     <section>
@@ -17,7 +20,10 @@ export function AssetBookingPage() {
           {data.map((asset) => (
             <article key={asset.id} className="asset-card">
               <h3>{asset.name}</h3>
-              <p>Status: {asset.status}</p>
+              <p className="asset-meta">
+                <span>Status</span>
+                <Badge tone={getAssetStatusTone(asset.status)}>{asset.status}</Badge>
+              </p>
               <p>Organization ID: {asset.organization?.id}</p>
               <p>Category: {asset.category?.name ?? "-"}</p>
               <p>{asset.description || "No description provided."}</p>
@@ -31,7 +37,7 @@ export function AssetBookingPage() {
           ))}
         </div>
       ) : (
-        <p>No assets available for booking.</p>
+        <EmptyState message="No assets available for booking." />
       )}
     </section>
   );

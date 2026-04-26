@@ -34,6 +34,7 @@ export function AssetCreatePage() {
         onSubmit={onSubmit}
         isSubmitting={createMutation.isPending}
         submitLabel="Create Asset"
+        serverError={createMutation.error}
       />
       {createMutation.isError && <p className="error">Failed to create asset: {createMutation.error.message}</p>}
     </>

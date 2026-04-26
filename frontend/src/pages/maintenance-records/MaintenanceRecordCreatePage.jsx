@@ -39,6 +39,7 @@ export function MaintenanceRecordCreatePage() {
         onSubmit={onSubmit}
         isSubmitting={createMutation.isPending}
         submitLabel="Create Maintenance Record"
+        serverError={createMutation.error}
       />
       {createMutation.isError && (
         <p className="error">Failed to create maintenance record: {createMutation.error.message}</p>

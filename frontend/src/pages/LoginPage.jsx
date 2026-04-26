@@ -9,6 +9,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect");
+  const registered = searchParams.get("registered") === "1";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -20,7 +21,7 @@ export function LoginPage() {
     setIsLoading(true);
     try {
       const user = await login({ email, password });
-      setAuth({ email: user.email, fullName: user.fullName, role: user.role?.name });
+      setAuth({ id: user.id, email: user.email, fullName: user.fullName, role: user.role?.name });
       navigate(redirect || "/app");
     } catch (submitError) {
       setError(getErrorMessage(submitError, "Invalid credentials."));
@@ -35,6 +36,7 @@ export function LoginPage() {
       <div className="auth-wrap">
         <form className="card" onSubmit={onSubmit}>
           <h2>Sign in</h2>
+          {registered && <p className="success">Account created. Please sign in.</p>}
           <label>
             Email
             <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />

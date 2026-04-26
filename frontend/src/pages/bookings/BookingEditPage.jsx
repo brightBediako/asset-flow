@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useBookingQuery, useUpdateBookingMutation } from "../../features/bookings/bookings.hooks";
 import { BookingForm } from "./BookingForm";
+import { BookingReadonlySummary } from "./BookingReadonlySummary";
 
 function toInputDateTime(value) {
   if (!value) return "";
@@ -36,11 +37,7 @@ export function BookingEditPage() {
 
   const initialValues = {
     organizationId: String(data?.organization?.id ?? ""),
-    assetId: String(data?.asset?.id ?? ""),
-    userId: String(data?.user?.id ?? ""),
     approvedById: data?.approvedBy?.id ? String(data.approvedBy.id) : "",
-    startTime: toInputDateTime(data?.startTime),
-    endTime: toInputDateTime(data?.endTime),
     status: data?.status ?? "PENDING",
     checkedInAt: toInputDateTime(data?.checkedInAt),
     checkedOutAt: toInputDateTime(data?.checkedOutAt),
@@ -51,11 +48,20 @@ export function BookingEditPage() {
       <p>
         <Link to="/app/bookings">Back to bookings</Link>
       </p>
+
+      <BookingReadonlySummary
+        booking={data}
+        compact
+        hint="Schedule and assignment cannot be changed here. Update status, approver, or check-in times below."
+      />
+
       <BookingForm
+        variant="edit"
         initialValues={initialValues}
         onSubmit={onSubmit}
         isSubmitting={updateMutation.isPending}
         submitLabel="Update Booking"
+        serverError={updateMutation.error}
       />
       {updateMutation.isError && (
         <p className="error">Failed to update booking: {updateMutation.error.message}</p>

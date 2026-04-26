@@ -14,4 +14,13 @@ export const bookingSchema = yup.object({
   checkedOutAt: yup.string().nullable(),
 });
 
+/** Fields editable on update (schedule and parties are fixed after create). */
+export const bookingEditSchema = yup.object({
+  organizationId: yup.string().optional(),
+  approvedById: yup.string().nullable(),
+  status: yup.string().oneOf(BOOKING_STATUS, "Invalid status").required("Status is required"),
+  checkedInAt: yup.string().nullable(),
+  checkedOutAt: yup.string().nullable(),
+});
+
 export const bookingStatusOptions = BOOKING_STATUS;

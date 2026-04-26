@@ -1,9 +1,14 @@
 import { Link } from "react-router-dom";
+import { Badge } from "../../components/ui/Badge";
+import { EmptyState, ErrorState, LoadingState } from "../../components/ui/QueryStates";
 import { useDeleteAssetMutation, useAssetsQuery } from "../../features/assets/assets.hooks";
+import { isAdminRole } from "../../lib/auth";
+import { getAssetStatusTone } from "../../lib/statusTone";
 
 export function AssetsListPage() {
   const { data, isLoading, isError, error } = useAssetsQuery();
   const deleteMutation = useDeleteAssetMutation();
+  const canManageAssets = isAdminRole();
 
   async function handleDelete(id) {
     const confirmed = globalThis.confirm("Delete this asset?");
@@ -11,15 +16,17 @@ export function AssetsListPage() {
     await deleteMutation.mutateAsync(id);
   }
 
-  if (isLoading) return <p>Loading assets...</p>;
-  if (isError) return <p className="error">Failed to load assets: {error.message}</p>;
+  if (isLoading) return <LoadingState message="Loading assets..." />;
+  if (isError) return <ErrorState error={error} fallback="Failed to load assets." />;
 
   return (
     <section>
       <h2>Assets</h2>
-      <p>
-        <Link to="/app/assets/new">Create Asset</Link>
-      </p>
+      {canManageAssets && (
+        <p>
+          <Link to="/app/assets/new">Create Asset</Link>
+        </p>
+      )}
       {deleteMutation.isError && <p className="error">Failed to delete asset.</p>}
       {data?.length ? (
         <table>
@@ -30,7 +37,7 @@ export function AssetsListPage() {
               <th>Status</th>
               <th>Organization ID</th>
               <th>Category</th>
-              <th>Actions</th>
+              {canManageAssets && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -38,21 +45,25 @@ export function AssetsListPage() {
               <tr key={asset.id}>
                 <td>{asset.id}</td>
                 <td>{asset.name}</td>
-                <td>{asset.status}</td>
+                <td>
+                  <Badge tone={getAssetStatusTone(asset.status)}>{asset.status}</Badge>
+                </td>
                 <td>{asset.organization?.id}</td>
                 <td>{asset.category?.name ?? "-"}</td>
-                <td>
-                  <Link to={`/app/assets/${asset.id}/edit`}>Edit</Link>{" "}
-                  <button onClick={() => handleDelete(asset.id)} disabled={deleteMutation.isPending}>
-                    Delete
-                  </button>
-                </td>
+                {canManageAssets && (
+                  <td>
+                    <Link to={`/app/assets/${asset.id}/edit`}>Edit</Link>{" "}
+                    <button onClick={() => handleDelete(asset.id)} disabled={deleteMutation.isPending}>
+                      Delete
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
       ) : (
-        <p>No assets found.</p>
+        <EmptyState message="No assets found." />
       )}
     </section>
   );

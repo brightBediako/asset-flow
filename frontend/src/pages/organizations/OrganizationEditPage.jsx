@@ -32,6 +32,7 @@ export function OrganizationEditPage() {
         onSubmit={onSubmit}
         isSubmitting={updateMutation.isPending}
         submitLabel="Update Organization"
+        serverError={updateMutation.error}
       />
       {updateMutation.isError && (
         <p className="error">Failed to update organization: {updateMutation.error.message}</p>

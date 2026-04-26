@@ -54,6 +54,7 @@ export function MaintenanceRecordEditPage() {
         onSubmit={onSubmit}
         isSubmitting={updateMutation.isPending}
         submitLabel="Update Maintenance Record"
+        serverError={updateMutation.error}
       />
       {updateMutation.isError && (
         <p className="error">Failed to update maintenance record: {updateMutation.error.message}</p>

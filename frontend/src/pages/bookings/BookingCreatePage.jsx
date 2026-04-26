@@ -45,6 +45,7 @@ export function BookingCreatePage() {
         onSubmit={onSubmit}
         isSubmitting={createMutation.isPending}
         submitLabel="Create Booking"
+        serverError={createMutation.error}
       />
       {createMutation.isError && (
         <p className="error">Failed to create booking: {createMutation.error.message}</p>

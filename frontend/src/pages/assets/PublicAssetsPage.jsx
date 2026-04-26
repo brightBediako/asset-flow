@@ -1,15 +1,18 @@
 import { Link } from "react-router-dom";
 import { PublicHeader } from "../../components/layout/PublicHeader";
+import { Badge } from "../../components/ui/Badge";
+import { EmptyState, ErrorState, LoadingState } from "../../components/ui/QueryStates";
 import { useAssetsQuery } from "../../features/assets/assets.hooks";
 import { isAuthenticated } from "../../lib/auth";
+import { getAssetStatusTone } from "../../lib/statusTone";
+
+function getBookingPath(asset) {
+  return `/app/bookings/new?organizationId=${asset.organization?.id ?? ""}&assetId=${asset.id}`;
+}
 
 export function PublicAssetsPage() {
   const authenticated = isAuthenticated();
   const { data, isLoading, isError, error } = useAssetsQuery();
-
-  function getBookingPath(asset) {
-    return `/app/bookings/new?organizationId=${asset.organization?.id ?? ""}&assetId=${asset.id}`;
-  }
 
   return (
     <>
@@ -20,8 +23,8 @@ export function PublicAssetsPage() {
       </section>
 
       <section className="home-section">
-        {isLoading && <p>Loading assets...</p>}
-        {isError && <p className="error">Failed to load assets: {error.message}</p>}
+        {isLoading && <LoadingState message="Loading assets..." />}
+        {isError && <ErrorState error={error} fallback="Failed to load assets." />}
 
         {!isLoading && !isError && (
           <>
@@ -30,7 +33,10 @@ export function PublicAssetsPage() {
                 {data.map((asset) => (
                   <article key={asset.id} className="asset-card">
                     <h3>{asset.name}</h3>
-                    <p>Status: {asset.status}</p>
+                    <p className="asset-meta">
+                      <span>Status</span>
+                      <Badge tone={getAssetStatusTone(asset.status)}>{asset.status}</Badge>
+                    </p>
                     <p>Organization ID: {asset.organization?.id}</p>
                     <p>Category: {asset.category?.name ?? "-"}</p>
                     <p>{asset.description || "No description provided."}</p>
@@ -53,7 +59,7 @@ export function PublicAssetsPage() {
                 ))}
               </div>
             ) : (
-              <p>No assets are currently listed.</p>
+              <EmptyState message="No assets are currently listed." />
             )}
           </>
         )}

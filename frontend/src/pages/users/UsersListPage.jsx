@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { EmptyState, ErrorState, LoadingState } from "../../components/ui/QueryStates";
 import { useDeleteUserMutation, useUsersQuery } from "../../features/users/users.hooks";
 
 export function UsersListPage() {
@@ -11,8 +12,8 @@ export function UsersListPage() {
     await deleteMutation.mutateAsync(id);
   }
 
-  if (isLoading) return <p>Loading users...</p>;
-  if (isError) return <p className="error">Failed to load users: {error.message}</p>;
+  if (isLoading) return <LoadingState message="Loading users..." />;
+  if (isError) return <ErrorState error={error} fallback="Failed to load users." />;
 
   return (
     <section>
@@ -52,7 +53,7 @@ export function UsersListPage() {
           </tbody>
         </table>
       ) : (
-        <p>No users found.</p>
+        <EmptyState message="No users found." />
       )}
     </section>
   );

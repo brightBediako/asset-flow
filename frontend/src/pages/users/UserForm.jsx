@@ -1,8 +1,21 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useOrganizationsQuery } from "../../features/organizations/organizations.hooks";
 import { useRolesQuery } from "../../features/roles/roles.hooks";
 import { userSchema } from "../../features/users/users.schema";
+import { applyServerFieldErrors } from "../../lib/formErrors";
+
+const USER_FIELD_MAP = {
+  fullName: "fullName",
+  email: "email",
+  role: "roleId",
+  "role.id": "roleId",
+  organization: "organizationId",
+  "organization.id": "organizationId",
+  passwordHash: "password",
+  password: "password",
+};
 
 export function UserForm({
   initialValues,
@@ -10,6 +23,7 @@ export function UserForm({
   isSubmitting,
   submitLabel,
   requirePassword = false,
+  serverError,
 }) {
   const { data: organizations = [] } = useOrganizationsQuery();
   const { data: roles = [] } = useRolesQuery();
@@ -17,11 +31,17 @@ export function UserForm({
   const {
     register,
     handleSubmit,
+    setError,
+    setFocus,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(userSchema),
     defaultValues: initialValues,
   });
+
+  useEffect(() => {
+    applyServerFieldErrors(serverError, setError, USER_FIELD_MAP, setFocus);
+  }, [serverError, setError, setFocus]);
 
   return (
     <form className="card" onSubmit={handleSubmit(onSubmit)}>

@@ -1,16 +1,28 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { organizationSchema } from "../../features/organizations/organizations.schema";
+import { applyServerFieldErrors } from "../../lib/formErrors";
 
-export function OrganizationForm({ initialValues, onSubmit, isSubmitting, submitLabel }) {
+const ORGANIZATION_FIELD_MAP = {
+  name: "name",
+};
+
+export function OrganizationForm({ initialValues, onSubmit, isSubmitting, submitLabel, serverError }) {
   const {
     register,
     handleSubmit,
+    setError,
+    setFocus,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(organizationSchema),
     defaultValues: initialValues,
   });
+
+  useEffect(() => {
+    applyServerFieldErrors(serverError, setError, ORGANIZATION_FIELD_MAP, setFocus);
+  }, [serverError, setError, setFocus]);
 
   return (
     <form className="card" onSubmit={handleSubmit(onSubmit)}>

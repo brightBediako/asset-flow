@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import { EmptyState, ErrorState, LoadingState } from "../../components/ui/QueryStates";
 import {
   useDeleteMaintenanceRecordMutation,
   useMaintenanceRecordsQuery,
 } from "../../features/maintenance-records/maintenanceRecords.hooks";
+import { formatDateTime } from "../../lib/format";
 
 export function MaintenanceRecordsListPage() {
   const { data, isLoading, isError, error } = useMaintenanceRecordsQuery();
@@ -14,8 +16,8 @@ export function MaintenanceRecordsListPage() {
     await deleteMutation.mutateAsync(id);
   }
 
-  if (isLoading) return <p>Loading maintenance records...</p>;
-  if (isError) return <p className="error">Failed to load maintenance records: {error.message}</p>;
+  if (isLoading) return <LoadingState message="Loading maintenance records..." />;
+  if (isError) return <ErrorState error={error} fallback="Failed to load maintenance records." />;
 
   return (
     <section>
@@ -46,8 +48,8 @@ export function MaintenanceRecordsListPage() {
                 <td>{record.asset?.name}</td>
                 <td>{record.createdBy?.fullName ?? "-"}</td>
                 <td>{record.description}</td>
-                <td>{record.startedAt}</td>
-                <td>{record.completedAt ?? "-"}</td>
+                <td>{formatDateTime(record.startedAt)}</td>
+                <td>{record.completedAt ? formatDateTime(record.completedAt) : "-"}</td>
                 <td>
                   <Link to={`/app/maintenance-records/${record.id}/edit`}>Edit</Link>{" "}
                   <button onClick={() => handleDelete(record.id)} disabled={deleteMutation.isPending}>
@@ -59,7 +61,7 @@ export function MaintenanceRecordsListPage() {
           </tbody>
         </table>
       ) : (
-        <p>No maintenance records found.</p>
+        <EmptyState message="No maintenance records found." />
       )}
     </section>
   );

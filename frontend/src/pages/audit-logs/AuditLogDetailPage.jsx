@@ -1,5 +1,8 @@
 import { Link, useParams } from "react-router-dom";
+import { Badge } from "../../components/ui/Badge";
 import { useAuditLogQuery } from "../../features/audit-logs/auditLogs.hooks";
+import { formatDateTime } from "../../lib/format";
+import { getAuditActionTone } from "../../lib/statusTone";
 
 export function AuditLogDetailPage() {
   const { id } = useParams();
@@ -18,7 +21,13 @@ export function AuditLogDetailPage() {
         <tbody>
           <tr>
             <th>Action</th>
-            <td>{data?.action}</td>
+            <td>
+              {data?.action ? (
+                <Badge tone={getAuditActionTone(data.action)}>{data.action}</Badge>
+              ) : (
+                "-"
+              )}
+            </td>
           </tr>
           <tr>
             <th>Entity Type</th>
@@ -38,7 +47,7 @@ export function AuditLogDetailPage() {
           </tr>
           <tr>
             <th>Created At</th>
-            <td>{data?.createdAt}</td>
+            <td>{formatDateTime(data?.createdAt)}</td>
           </tr>
           <tr>
             <th>Details</th>

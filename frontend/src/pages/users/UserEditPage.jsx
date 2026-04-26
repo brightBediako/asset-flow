@@ -43,6 +43,7 @@ export function UserEditPage() {
         onSubmit={onSubmit}
         isSubmitting={updateMutation.isPending}
         submitLabel="Update User"
+        serverError={updateMutation.error}
       />
       {updateMutation.isError && <p className="error">Failed to update user: {updateMutation.error.message}</p>}
     </>

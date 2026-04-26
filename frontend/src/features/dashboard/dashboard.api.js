@@ -1,10 +1,6 @@
 import { apiClient } from "../../lib/apiClient";
-import { env } from "../../lib/env";
-import { mockApi } from "../../lib/mockApi";
 
 export async function getDashboardSummary() {
-  if (env.useMockData) return mockApi.dashboard.summary();
-
   const [organizations, users, assets, bookings] = await Promise.all([
     apiClient.get("/organizations"),
     apiClient.get("/users"),

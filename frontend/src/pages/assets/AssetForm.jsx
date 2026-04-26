@@ -1,16 +1,31 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useAssetCategoriesQuery } from "../../features/asset-categories/assetCategories.hooks";
 import { assetSchema, assetStatusOptions } from "../../features/assets/assets.schema";
 import { useOrganizationsQuery } from "../../features/organizations/organizations.hooks";
+import { applyServerFieldErrors } from "../../lib/formErrors";
 
-export function AssetForm({ initialValues, onSubmit, isSubmitting, submitLabel }) {
+const ASSET_FIELD_MAP = {
+  name: "name",
+  description: "description",
+  status: "status",
+  imageUrl: "imageUrl",
+  organization: "organizationId",
+  "organization.id": "organizationId",
+  category: "categoryId",
+  "category.id": "categoryId",
+};
+
+export function AssetForm({ initialValues, onSubmit, isSubmitting, submitLabel, serverError }) {
   const { data: organizations = [] } = useOrganizationsQuery();
   const { data: categories = [] } = useAssetCategoriesQuery();
   const {
     register,
     handleSubmit,
     control,
+    setError,
+    setFocus,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(assetSchema),
@@ -21,6 +36,10 @@ export function AssetForm({ initialValues, onSubmit, isSubmitting, submitLabel }
   const filteredCategories = categories.filter(
     (category) => String(category.organization?.id) === String(selectedOrganizationId),
   );
+
+  useEffect(() => {
+    applyServerFieldErrors(serverError, setError, ASSET_FIELD_MAP, setFocus);
+  }, [serverError, setError, setFocus]);
 
   return (
     <form className="card" onSubmit={handleSubmit(onSubmit)}>

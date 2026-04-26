@@ -20,7 +20,10 @@ export function RegisterPage() {
     setError("");
     setIsLoading(true);
     try {
-      const userRole = roles.find((role) => role.name === "USER") || roles[0];
+      const userRole =
+        roles.find((role) => String(role.name || "").toUpperCase() === "USER") ||
+        roles.find((role) => String(role.name || "").toUpperCase() === "ORG_ADMIN") ||
+        roles[0];
       if (!userRole?.id) {
         setError("Roles are not loaded yet. Please try again.");
         return;
@@ -33,7 +36,7 @@ export function RegisterPage() {
         roleId: userRole.id,
         organizationId: organizationId ? Number(organizationId) : undefined,
       });
-      navigate("/login");
+      navigate("/login?registered=1");
     } catch (submitError) {
       setError(getErrorMessage(submitError, "Registration failed."));
     } finally {

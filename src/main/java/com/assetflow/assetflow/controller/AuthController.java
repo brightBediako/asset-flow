@@ -41,13 +41,14 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request) {
         Long roleId = request.roleId();
         if (roleId == null) {
-            roleId = roleRepository.findByName("User")
+            roleId = roleRepository.findByName("USER")
+                    .or(() -> roleRepository.findByName("User"))
                     .map(Role::getId)
                     .orElse(null);
         }
         if (roleId == null) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("error", "roleId is required. Create a 'User' role via POST /api/roles first, or send roleId in the request body."));
+                    .body(Map.of("error", "roleId is required. Create a 'USER' role via POST /api/roles first, or send roleId in the request body."));
         }
         User user = new User();
         user.setEmail(request.email());
