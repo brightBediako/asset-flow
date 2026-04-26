@@ -18,7 +18,7 @@ export function UsersListPage() {
     <section>
       <h2>Users</h2>
       <p>
-        <Link to="/users/new">Create User</Link>
+        <Link to="/app/users/new">Create User</Link>
       </p>
       {deleteMutation.isError && <p className="error">Failed to delete user.</p>}
       {data?.length ? (
@@ -42,7 +42,7 @@ export function UsersListPage() {
                 <td>{user.role?.name}</td>
                 <td>{user.organization?.id ?? "-"}</td>
                 <td>
-                  <Link to={`/users/${user.id}/edit`}>Edit</Link>{" "}
+                  <Link to={`/app/users/${user.id}/edit`}>Edit</Link>{" "}
                   <button onClick={() => handleDelete(user.id)} disabled={deleteMutation.isPending}>
                     Delete
                   </button>

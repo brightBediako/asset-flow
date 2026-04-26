@@ -8,6 +8,12 @@ export async function login(payload) {
   return data;
 }
 
+export async function registerUser(payload) {
+  if (env.useMockData) return mockApi.auth.register(payload);
+  const { data } = await apiClient.post("/auth/register", payload);
+  return data;
+}
+
 export async function getMe() {
   if (env.useMockData) return mockApi.auth.me();
   const { data } = await apiClient.get("/auth/me");

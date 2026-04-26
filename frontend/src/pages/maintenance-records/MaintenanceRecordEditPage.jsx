@@ -29,7 +29,7 @@ export function MaintenanceRecordEditPage() {
         completedAt: toIsoOrNull(values.completedAt),
       },
     });
-    navigate("/maintenance-records");
+    navigate("/app/maintenance-records");
   }
 
   if (isLoading) return <p>Loading maintenance record...</p>;
@@ -47,7 +47,7 @@ export function MaintenanceRecordEditPage() {
   return (
     <>
       <p>
-        <Link to="/maintenance-records">Back to maintenance records</Link>
+        <Link to="/app/maintenance-records">Back to maintenance records</Link>
       </p>
       <MaintenanceRecordForm
         initialValues={initialValues}

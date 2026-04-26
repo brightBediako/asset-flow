@@ -28,7 +28,7 @@ export function BookingEditPage() {
         checkedOutAt: toIsoOrNull(values.checkedOutAt),
       },
     });
-    navigate("/bookings");
+    navigate("/app/bookings");
   }
 
   if (isLoading) return <p>Loading booking...</p>;
@@ -49,7 +49,7 @@ export function BookingEditPage() {
   return (
     <>
       <p>
-        <Link to="/bookings">Back to bookings</Link>
+        <Link to="/app/bookings">Back to bookings</Link>
       </p>
       <BookingForm
         initialValues={initialValues}

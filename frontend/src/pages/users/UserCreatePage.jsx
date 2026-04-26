@@ -29,7 +29,7 @@ export function UserCreatePage() {
       role: { id: Number(values.roleId) },
       organization: values.organizationId ? { id: Number(values.organizationId) } : null,
     });
-    navigate("/users");
+    navigate("/app/users");
   }
 
   return (

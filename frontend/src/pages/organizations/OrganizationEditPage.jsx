@@ -16,7 +16,7 @@ export function OrganizationEditPage() {
       id,
       payload: { name: values.name.trim() },
     });
-    navigate("/organizations");
+    navigate("/app/organizations");
   }
 
   if (isLoading) return <p>Loading organization...</p>;
@@ -25,7 +25,7 @@ export function OrganizationEditPage() {
   return (
     <>
       <p>
-        <Link to="/organizations">Back to organizations</Link>
+        <Link to="/app/organizations">Back to organizations</Link>
       </p>
       <OrganizationForm
         initialValues={{ name: data?.name ?? "" }}

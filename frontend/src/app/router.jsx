@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { Navigate, createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "../components/layout/AppLayout";
 import { ProtectedRoute } from "../components/layout/ProtectedRoute";
 import { DashboardPage } from "../pages/DashboardPage";
@@ -7,12 +7,14 @@ import { AssetCreatePage } from "../pages/assets/AssetCreatePage";
 import { AssetEditPage } from "../pages/assets/AssetEditPage";
 import { AssetBookingPage } from "../pages/assets/AssetBookingPage";
 import { AssetsListPage } from "../pages/assets/AssetsListPage";
+import { PublicAssetsPage } from "../pages/assets/PublicAssetsPage";
 import { AuditLogDetailPage } from "../pages/audit-logs/AuditLogDetailPage";
 import { AuditLogsListPage } from "../pages/audit-logs/AuditLogsListPage";
 import { BookingCreatePage } from "../pages/bookings/BookingCreatePage";
 import { BookingEditPage } from "../pages/bookings/BookingEditPage";
 import { BookingsListPage } from "../pages/bookings/BookingsListPage";
 import { LoginPage } from "../pages/LoginPage";
+import { RegisterPage } from "../pages/RegisterPage";
 import { MaintenanceRecordCreatePage } from "../pages/maintenance-records/MaintenanceRecordCreatePage";
 import { MaintenanceRecordEditPage } from "../pages/maintenance-records/MaintenanceRecordEditPage";
 import { MaintenanceRecordsListPage } from "../pages/maintenance-records/MaintenanceRecordsListPage";
@@ -25,15 +27,27 @@ import { UsersListPage } from "../pages/users/UsersListPage";
 
 export const router = createBrowserRouter([
   {
+    path: "/",
+    element: <Navigate to="/home" replace />,
+  },
+  {
     path: "/home",
     element: <HomePage />,
+  },
+  {
+    path: "/assets",
+    element: <PublicAssetsPage />,
   },
   {
     path: "/login",
     element: <LoginPage />,
   },
   {
-    path: "/",
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
+    path: "/app",
     element: (
       <ProtectedRoute>
         <AppLayout />

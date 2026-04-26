@@ -67,7 +67,7 @@ export function AuditLogsListPage() {
                     <td>{log.user?.fullName ?? "-"}</td>
                     <td>{log.createdAt}</td>
                     <td>
-                      <Link to={`/audit-logs/${log.id}`}>View</Link>
+                      <Link to={`/app/audit-logs/${log.id}`}>View</Link>
                     </td>
                   </tr>
                 ))}

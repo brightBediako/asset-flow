@@ -21,7 +21,7 @@ export function MaintenanceRecordsListPage() {
     <section>
       <h2>Maintenance Records</h2>
       <p>
-        <Link to="/maintenance-records/new">Create Maintenance Record</Link>
+        <Link to="/app/maintenance-records/new">Create Maintenance Record</Link>
       </p>
       {deleteMutation.isError && <p className="error">Failed to delete maintenance record.</p>}
       {data?.length ? (
@@ -49,7 +49,7 @@ export function MaintenanceRecordsListPage() {
                 <td>{record.startedAt}</td>
                 <td>{record.completedAt ?? "-"}</td>
                 <td>
-                  <Link to={`/maintenance-records/${record.id}/edit`}>Edit</Link>{" "}
+                  <Link to={`/app/maintenance-records/${record.id}/edit`}>Edit</Link>{" "}
                   <button onClick={() => handleDelete(record.id)} disabled={deleteMutation.isPending}>
                     Delete
                   </button>

@@ -19,7 +19,7 @@ export function OrganizationsListPage() {
     <section>
       <h2>Organizations</h2>
       <p>
-        <Link to="/organizations/new">Create Organization</Link>
+        <Link to="/app/organizations/new">Create Organization</Link>
       </p>
       {deleteMutation.isError && <p className="error">Failed to delete organization.</p>}
       {data?.length ? (
@@ -37,7 +37,7 @@ export function OrganizationsListPage() {
                 <td>{organization.id}</td>
                 <td>{organization.name}</td>
                 <td>
-                  <Link to={`/organizations/${organization.id}/edit`}>Edit</Link>{" "}
+                  <Link to={`/app/organizations/${organization.id}/edit`}>Edit</Link>{" "}
                   <button
                     onClick={() => handleDelete(organization.id)}
                     disabled={deleteMutation.isPending}

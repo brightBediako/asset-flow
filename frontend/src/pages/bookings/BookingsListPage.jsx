@@ -18,7 +18,7 @@ export function BookingsListPage() {
     <section>
       <h2>Bookings</h2>
       <p>
-        <Link to="/bookings/new">Create Booking</Link>
+        <Link to="/app/bookings/new">Create Booking</Link>
       </p>
       {deleteMutation.isError && <p className="error">Failed to delete booking.</p>}
       {data?.length ? (
@@ -46,7 +46,7 @@ export function BookingsListPage() {
                 <td>{booking.startTime}</td>
                 <td>{booking.endTime}</td>
                 <td>
-                  <Link to={`/bookings/${booking.id}/edit`}>Edit</Link>{" "}
+                  <Link to={`/app/bookings/${booking.id}/edit`}>Edit</Link>{" "}
                   <button onClick={() => handleDelete(booking.id)} disabled={deleteMutation.isPending}>
                     Delete
                   </button>

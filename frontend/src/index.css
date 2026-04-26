@@ -28,6 +28,30 @@ a {
   border-bottom: 1px solid #e5e7eb;
 }
 
+.public-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.public-header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  font-weight: 700;
+  color: #111827;
+}
+
+.public-nav {
+  display: flex;
+  gap: 12px;
+}
+
 .topbar h1 {
   margin: 0;
   font-size: 20px;
@@ -195,4 +219,37 @@ pre {
 
 .asset-card h3 {
   margin: 0 0 8px;
+}
+
+.home-section {
+  max-width: 1100px;
+  margin: 0 auto 32px;
+  padding: 0 20px;
+}
+
+.home-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.home-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.home-card h3 {
+  margin: 0 0 8px;
+}
+
+.home-card p {
+  margin: 0;
+  color: #4b5563;
+}
+
+.home-section-cta {
+  padding-bottom: 24px;
 }

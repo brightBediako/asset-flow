@@ -19,7 +19,7 @@ export function UserEditPage() {
       payload.passwordHash = values.password;
     }
     await updateMutation.mutateAsync({ id, payload });
-    navigate("/users");
+    navigate("/app/users");
   }
 
   if (isLoading) return <p>Loading user...</p>;
@@ -36,7 +36,7 @@ export function UserEditPage() {
   return (
     <>
       <p>
-        <Link to="/users">Back to users</Link>
+        <Link to="/app/users">Back to users</Link>
       </p>
       <UserForm
         initialValues={initialValues}

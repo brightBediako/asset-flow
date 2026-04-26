@@ -16,14 +16,14 @@ export function AppLayout() {
         <h1>AssetFlow</h1>
         <nav>
           <Link to="/home">Home</Link>
-          <Link to="/">Dashboard</Link>
-          <Link to="/organizations">Organizations</Link>
-          <Link to="/users">Users</Link>
-          <Link to="/assets">Assets</Link>
-          <Link to="/asset-booking">Book Assets</Link>
-          <Link to="/bookings">Bookings</Link>
-          <Link to="/maintenance-records">Maintenance</Link>
-          <Link to="/audit-logs">Audit Logs</Link>
+          <Link to="/app">Dashboard</Link>
+          <Link to="/app/organizations">Organizations</Link>
+          <Link to="/app/users">Users</Link>
+          <Link to="/app/assets">Assets</Link>
+          <Link to="/app/asset-booking">Book Assets</Link>
+          <Link to="/app/bookings">Bookings</Link>
+          <Link to="/app/maintenance-records">Maintenance</Link>
+          <Link to="/app/audit-logs">Audit Logs</Link>
         </nav>
         <div className="topbar-right">
           <span>{auth?.email}</span>

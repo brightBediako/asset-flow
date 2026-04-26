@@ -130,6 +130,22 @@ export const mockApi = {
       }
       return { ...state.me, email: payload.email };
     },
+    async register(payload) {
+      await wait();
+      if (!payload?.email || !payload?.password || !payload?.fullName || !payload?.roleId) {
+        throw new Error("fullName, email, password, and roleId are required");
+      }
+      const role = state.roles.find((item) => String(item.id) === String(payload.roleId));
+      const user = {
+        id: nextId(state.users),
+        email: payload.email,
+        fullName: payload.fullName,
+        organization: payload.organizationId ? { id: Number(payload.organizationId) } : null,
+        role: role ?? { id: Number(payload.roleId), name: "USER" },
+      };
+      state.users.push(user);
+      return { ...user };
+    },
     async me() {
       await wait();
       return { ...state.me };

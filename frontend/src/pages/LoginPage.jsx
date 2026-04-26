@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { PublicHeader } from "../components/layout/PublicHeader";
 import { login } from "../features/auth/auth.api";
 import { setAuth } from "../lib/auth";
 
@@ -17,7 +18,7 @@ export function LoginPage() {
     try {
       const user = await login({ email, password });
       setAuth({ email: user.email, fullName: user.fullName, role: user.role?.name });
-      navigate("/");
+      navigate("/app");
     } catch {
       setError("Invalid credentials.");
     } finally {
@@ -26,27 +27,33 @@ export function LoginPage() {
   }
 
   return (
-    <div className="auth-wrap">
-      <form className="card" onSubmit={onSubmit}>
-        <h2>Sign in</h2>
-        <label>
-          Email
-          <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
-        </label>
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </label>
-        {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Signing in..." : "Sign in"}
-        </button>
-      </form>
-    </div>
+    <>
+      <PublicHeader />
+      <div className="auth-wrap">
+        <form className="card" onSubmit={onSubmit}>
+          <h2>Sign in</h2>
+          <label>
+            Email
+            <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+          </label>
+          <label>
+            Password
+            <input
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </label>
+          {error && <p className="error">{error}</p>}
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign in"}
+          </button>
+          <p>
+            No account yet? <Link to="/register">Register</Link>
+          </p>
+        </form>
+      </div>
+    </>
   );
 }

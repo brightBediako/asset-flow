@@ -12,7 +12,7 @@ export function OrganizationCreatePage() {
 
   async function onSubmit(values) {
     await createMutation.mutateAsync({ name: values.name.trim() });
-    navigate("/organizations");
+    navigate("/app/organizations");
   }
 
   return (

@@ -18,7 +18,7 @@ export function AssetsListPage() {
     <section>
       <h2>Assets</h2>
       <p>
-        <Link to="/assets/new">Create Asset</Link>
+        <Link to="/app/assets/new">Create Asset</Link>
       </p>
       {deleteMutation.isError && <p className="error">Failed to delete asset.</p>}
       {data?.length ? (
@@ -42,7 +42,7 @@ export function AssetsListPage() {
                 <td>{asset.organization?.id}</td>
                 <td>{asset.category?.name ?? "-"}</td>
                 <td>
-                  <Link to={`/assets/${asset.id}/edit`}>Edit</Link>{" "}
+                  <Link to={`/app/assets/${asset.id}/edit`}>Edit</Link>{" "}
                   <button onClick={() => handleDelete(asset.id)} disabled={deleteMutation.isPending}>
                     Delete
                   </button>

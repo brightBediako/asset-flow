@@ -22,7 +22,7 @@ export function AssetBookingPage() {
               <p>Category: {asset.category?.name ?? "-"}</p>
               <p>{asset.description || "No description provided."}</p>
               <Link
-                to={`/bookings/new?organizationId=${asset.organization?.id ?? ""}&assetId=${asset.id}`}
+                to={`/app/bookings/new?organizationId=${asset.organization?.id ?? ""}&assetId=${asset.id}`}
                 className="asset-book-link"
               >
                 Book this asset

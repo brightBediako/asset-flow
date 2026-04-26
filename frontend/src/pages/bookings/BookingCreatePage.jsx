@@ -35,7 +35,7 @@ export function BookingCreatePage() {
       checkedInAt: toIsoOrNull(values.checkedInAt),
       checkedOutAt: toIsoOrNull(values.checkedOutAt),
     });
-    navigate("/bookings");
+    navigate("/app/bookings");
   }
 
   return (

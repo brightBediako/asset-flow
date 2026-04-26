@@ -11,7 +11,7 @@ export function AuditLogDetailPage() {
   return (
     <section>
       <p>
-        <Link to="/audit-logs">Back to audit logs</Link>
+        <Link to="/app/audit-logs">Back to audit logs</Link>
       </p>
       <h2>Audit Log #{data?.id}</h2>
       <table>

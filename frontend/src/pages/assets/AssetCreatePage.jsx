@@ -24,7 +24,7 @@ export function AssetCreatePage() {
       organization: { id: Number(values.organizationId) },
       category: values.categoryId ? { id: Number(values.categoryId) } : null,
     });
-    navigate("/assets");
+    navigate("/app/assets");
   }
 
   return (

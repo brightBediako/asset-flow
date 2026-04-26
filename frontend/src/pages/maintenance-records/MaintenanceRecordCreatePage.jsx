@@ -29,7 +29,7 @@ export function MaintenanceRecordCreatePage() {
       startedAt: toIsoOrNull(values.startedAt),
       completedAt: toIsoOrNull(values.completedAt),
     });
-    navigate("/maintenance-records");
+    navigate("/app/maintenance-records");
   }
 
   return (

@@ -20,7 +20,7 @@ export function AssetEditPage() {
         category: values.categoryId ? { id: Number(values.categoryId) } : null,
       },
     });
-    navigate("/assets");
+    navigate("/app/assets");
   }
 
   if (isLoading) return <p>Loading asset...</p>;
@@ -38,7 +38,7 @@ export function AssetEditPage() {
   return (
     <>
       <p>
-        <Link to="/assets">Back to assets</Link>
+        <Link to="/app/assets">Back to assets</Link>
       </p>
       <AssetForm
         initialValues={initialValues}
