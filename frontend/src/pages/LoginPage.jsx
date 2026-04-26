@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { PublicHeader } from "../components/layout/PublicHeader";
 import { login } from "../features/auth/auth.api";
 import { setAuth } from "../lib/auth";
+import { getErrorMessage } from "../lib/errors";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,9 +21,9 @@ export function LoginPage() {
     try {
       const user = await login({ email, password });
       setAuth({ email: user.email, fullName: user.fullName, role: user.role?.name });
-      navigate("/app");
-    } catch {
-      setError("Invalid credentials.");
+      navigate(redirect || "/app");
+    } catch (submitError) {
+      setError(getErrorMessage(submitError, "Invalid credentials."));
     } finally {
       setIsLoading(false);
     }

@@ -7,6 +7,10 @@ export function PublicAssetsPage() {
   const authenticated = isAuthenticated();
   const { data, isLoading, isError, error } = useAssetsQuery();
 
+  function getBookingPath(asset) {
+    return `/app/bookings/new?organizationId=${asset.organization?.id ?? ""}&assetId=${asset.id}`;
+  }
+
   return (
     <>
       <PublicHeader />
@@ -32,13 +36,16 @@ export function PublicAssetsPage() {
                     <p>{asset.description || "No description provided."}</p>
                     {authenticated ? (
                       <Link
-                        to={`/app/bookings/new?organizationId=${asset.organization?.id ?? ""}&assetId=${asset.id}`}
+                        to={getBookingPath(asset)}
                         className="asset-book-link"
                       >
                         Book this asset
                       </Link>
                     ) : (
-                      <Link to="/login" className="asset-book-link">
+                      <Link
+                        to={`/login?redirect=${encodeURIComponent(getBookingPath(asset))}`}
+                        className="asset-book-link"
+                      >
                         Sign in to book
                       </Link>
                     )}

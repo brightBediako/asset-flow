@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PublicHeader } from "../components/layout/PublicHeader";
+import { useRolesQuery } from "../features/roles/roles.hooks";
 import { registerUser } from "../features/auth/auth.api";
+import { getErrorMessage } from "../lib/errors";
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const { data: roles = [] } = useRolesQuery();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,16 +20,22 @@ export function RegisterPage() {
     setError("");
     setIsLoading(true);
     try {
+      const userRole = roles.find((role) => role.name === "USER") || roles[0];
+      if (!userRole?.id) {
+        setError("Roles are not loaded yet. Please try again.");
+        return;
+      }
+
       await registerUser({
         fullName: fullName.trim(),
         email: email.trim().toLowerCase(),
         password,
-        roleId: 3,
+        roleId: userRole.id,
         organizationId: organizationId ? Number(organizationId) : undefined,
       });
       navigate("/login");
     } catch (submitError) {
-      setError(submitError?.message || "Registration failed.");
+      setError(getErrorMessage(submitError, "Registration failed."));
     } finally {
       setIsLoading(false);
     }
