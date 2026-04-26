@@ -24,7 +24,7 @@ jobs:
         run: mvn -B test
 
   frontend:
-    name: Frontend Lint and Build
+    name: Frontend Test Lint and Build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -45,6 +45,9 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Test
+        run: npm run test
 
       - name: Build
         run: npm run build
