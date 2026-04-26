@@ -1,17 +1,29 @@
 import { apiClient } from "../../lib/apiClient";
 
+async function getCountOrZero(path) {
+  try {
+    const response = await apiClient.get(path);
+    return response.data?.length ?? 0;
+  } catch (error) {
+    if (error?.response?.status === 403) {
+      return 0;
+    }
+    throw error;
+  }
+}
+
 export async function getDashboardSummary() {
   const [organizations, users, assets, bookings] = await Promise.all([
-    apiClient.get("/organizations"),
-    apiClient.get("/users"),
-    apiClient.get("/assets"),
-    apiClient.get("/bookings"),
+    getCountOrZero("/organizations"),
+    getCountOrZero("/users"),
+    getCountOrZero("/assets"),
+    getCountOrZero("/bookings"),
   ]);
 
   return {
-    organizations: organizations.data?.length ?? 0,
-    users: users.data?.length ?? 0,
-    assets: assets.data?.length ?? 0,
-    bookings: bookings.data?.length ?? 0,
+    organizations,
+    users,
+    assets,
+    bookings,
   };
 }

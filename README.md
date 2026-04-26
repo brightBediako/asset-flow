@@ -40,8 +40,7 @@ A centralized API for organizations to manage, track, and book shared physical a
 
    - `DB_URL` (default: `jdbc:postgresql://localhost:5432/assetflow`)
    - `DB_USERNAME` (default: `postgres`)
-   - `DB_PASSWORD` (required)
-   - `SPRING_PROFILES_ACTIVE` (`dev` or `prod`, default `dev`)
+   - `DB_PASSWORD` (default local value is provided in app config)
    - `CORS_ALLOWED_ORIGINS` (comma-separated, default `http://localhost:5173`)
    - Optional: `JPA_DDL_AUTO`, `SERVER_PORT`
 
@@ -80,17 +79,6 @@ A frontend app is available in `frontend/`.
 
    Frontend URL: **http://localhost:5173**
 
-## Docker quick start
-
-Run the full stack (Postgres + backend + frontend):
-
-```bash
-docker compose up --build
-```
-
-- Frontend: `http://localhost:8081`
-- Backend API: `http://localhost:8080/api`
-
 ## API
 
 Full endpoint list and auth flow: **[API.md](API.md)**  
@@ -108,11 +96,9 @@ Postman collection: [postman/AssetFlow-API.postman_collection.json](postman/Asse
 
 ## Production deployment notes
 
-1. Set `SPRING_PROFILES_ACTIVE=prod`.
-2. Set `DB_PASSWORD` from a secret manager (do not hardcode).
-3. Set `CORS_ALLOWED_ORIGINS` to your frontend domain(s).
-4. Keep `JPA_DDL_AUTO=validate` in production and manage schema changes via Flyway SQL migrations in `src/main/resources/db/migration`.
-5. Put TLS at the reverse proxy/load balancer and set:
+1. Set `DB_PASSWORD` from a secret manager (do not hardcode).
+2. Set `CORS_ALLOWED_ORIGINS` to your frontend domain(s).
+3. Put TLS at the reverse proxy/load balancer and set:
    - `SESSION_COOKIE_SECURE=true`
    - `SESSION_COOKIE_SAME_SITE=none` (only when frontend/backend are cross-site over HTTPS)
 
