@@ -1,50 +1,20 @@
-# AssetFlow Frontend
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-React + Vite frontend for AssetFlow.
+# Run and deploy your AI Studio app
 
-## Requirements
+This contains everything you need to run your app locally.
 
-- Node.js 22+
-- npm
+View your app in AI Studio: https://ai.studio/apps/ffa70cca-862d-40ac-88b1-a0c909afc105
 
-## Local development
+## Run Locally
+
+**Prerequisites:**  Node.js
+
 
 1. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-2. Create env file:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Set API base URL in `.env`:
-
-   ```env
-   VITE_API_BASE_URL=http://localhost:8080/api
-   ```
-
-4. Run dev server:
-
-   ```bash
-   npm run dev
-   ```
-
-## Build and quality checks
-
-```bash
-npm run lint
-npm run build
-```
-
-## Docker
-
-Build and run frontend image:
-
-```bash
-docker build -t assetflow-frontend .
-docker run --rm -p 8081:80 assetflow-frontend
-```
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
