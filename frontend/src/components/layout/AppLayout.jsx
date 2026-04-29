@@ -146,7 +146,6 @@ export default function AppLayout() {
       )}>
         {/* Top Header */}
         <header className="h-16 bg-white border-b border-[#E2E8F0] sticky top-0 z-30 flex items-center justify-between px-4 lg:px-8 shadow-sm">
-/50">
           <div className="flex items-center gap-4 lg:hidden">
              <button 
                 onClick={() => setIsMobileMenuOpen(true)}
