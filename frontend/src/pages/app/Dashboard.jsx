@@ -1,10 +1,9 @@
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Card, Button } from '@/components/ui/BaseComponents';
-import { cn, formatDate } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import { motion } from 'motion/react';
 import { 
   Users, 
   Box, 
@@ -22,9 +21,30 @@ export default function Dashboard() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      const response = await apiClient.get('/stats/summary');
-      return response.data;
+      const [assetsResp, usersResp, bookingsResp, maintenanceResp] = await Promise.all([
+        apiClient.get('/assets/search', { params: { page: 0, size: 1 } }),
+        apiClient.get('/users/search', { params: { page: 0, size: 1 } }),
+        apiClient.get('/bookings/search', { params: { page: 0, size: 200 } }),
+        apiClient.get('/maintenance-records'),
+      ]);
+
+      const bookings = bookingsResp.data?.content || [];
+      const activeBookings = bookings.filter((booking) =>
+        ['APPROVED', 'PENDING', 'IN_PROGRESS'].includes(booking.status)
+      ).length;
+      const pendingMaintenance = (maintenanceResp.data || []).filter((record) =>
+        ['PENDING', 'SCHEDULED', 'OPEN'].includes(record.status)
+      ).length;
+
+      return {
+        totalAssets: assetsResp.data?.totalElements ?? 0,
+        activeUsers: usersResp.data?.totalElements ?? 0,
+        activeBookings,
+        pendingMaintenance,
+        recentActivity: [],
+      };
     },
+    retry: 0,
   });
 
   const StatCard = ({ title, value, icon: Icon, trend, colorClass }) => (

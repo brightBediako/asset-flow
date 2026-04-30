@@ -10,10 +10,10 @@ import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 const schema = yup.object().shape({
-  name: yup.string().required('Full name is required'),
+  fullName: yup.string().required('Full name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
-  password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-  orgName: yup.string().when('accountType', {
+  password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
+  organizationName: yup.string().when('accountType', {
     is: 'ORGANIZATION',
     then: (schema) => schema.required('Organization name is required'),
   }),
@@ -103,8 +103,8 @@ export default function Register() {
               <Input
                 label="Full Name"
                 placeholder="John Doe"
-                error={errors.name?.message}
-                {...register('name')}
+                error={errors.fullName?.message}
+                {...register('fullName')}
               />
               <Input
                 label="Email Address"
@@ -128,8 +128,8 @@ export default function Register() {
                 <Input
                   label="Organization Name"
                   placeholder="Acme Corp"
-                  error={errors.orgName?.message}
-                  {...register('orgName')}
+                  error={errors.organizationName?.message}
+                  {...register('organizationName')}
                 />
               </div>
             )}

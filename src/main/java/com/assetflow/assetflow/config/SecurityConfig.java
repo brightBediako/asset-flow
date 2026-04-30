@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         // Read access for any authenticated user; write requires SUPER_ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/roles", "/api/roles/**").authenticated()

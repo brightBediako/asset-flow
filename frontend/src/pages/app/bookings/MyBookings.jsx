@@ -4,18 +4,16 @@ import apiClient from '@/api/client';
 import ListLayout from '@/components/common/ListLayout';
 import { Badge, Button } from '@/components/ui/BaseComponents';
 import { formatDate } from '@/lib/utils';
-import { useAuth } from '@/context/AuthContext';
 import { CalendarX, Clock, History } from 'lucide-react';
 
 export default function MyBookings() {
-  const { user } = useAuth();
   const [params, setParams] = useState({ page: 0, size: 10, search: '' });
 
   const { data, isLoading } = useQuery({
     queryKey: ['my-bookings', params],
     queryFn: async () => {
-      // Server-side filter typically handles current user scope
-      const resp = await apiClient.get('/bookings/my-bookings', { params });
+      // Backend scopes non-admin users to their own bookings.
+      const resp = await apiClient.get('/bookings/search', { params });
       return resp.data;
     },
   });

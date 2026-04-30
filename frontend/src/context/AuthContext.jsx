@@ -3,6 +3,16 @@ import apiClient from '../api/client';
 
 const AuthContext = createContext(null);
 
+function normalizeUser(rawUser) {
+  if (!rawUser) return null;
+  return {
+    ...rawUser,
+    // Keep frontend shape stable across backend payload variations.
+    name: rawUser.name ?? rawUser.fullName ?? '',
+    role: typeof rawUser.role === 'string' ? rawUser.role : rawUser.role?.name ?? '',
+  };
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,7 +20,7 @@ export function AuthProvider({ children }) {
   const fetchMe = async () => {
     try {
       const response = await apiClient.get('/auth/me');
-      setUser(response.data);
+      setUser(normalizeUser(response.data));
     } catch (error) {
       setUser(null);
     } finally {
@@ -24,8 +34,9 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     const response = await apiClient.post('/auth/login', credentials);
-    setUser(response.data);
-    return response.data;
+    const normalized = normalizeUser(response.data);
+    setUser(normalized);
+    return normalized;
   };
 
   const logout = async () => {
