@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 export default function CategoryList() {
   const queryClient = useQueryClient();
   const [params, setParams] = useState({ page: 0, size: 20, q: '' });
-  const [form, setForm] = useState({ organizationId: '', name: '' });
+  const [form, setForm] = useState({ organizationId: 'GLOBAL', name: '' });
 
   const { data: organizations = [] } = useQuery({
     queryKey: ['category-organizations'],
@@ -22,13 +22,12 @@ export default function CategoryList() {
   const { data: categories = [], isLoading } = useQuery({
     queryKey: ['categories', form.organizationId],
     queryFn: async () => {
-      if (!form.organizationId) return [];
       const resp = await apiClient.get('/asset-categories', {
-        params: { organizationId: form.organizationId },
+        params: form.organizationId && form.organizationId !== 'GLOBAL' ? { organizationId: form.organizationId } : {},
       });
       return resp.data;
     },
-    enabled: Boolean(form.organizationId),
+    enabled: true,
   });
 
   const createCategory = useMutation({
@@ -81,6 +80,10 @@ export default function CategoryList() {
       accessor: 'name',
     },
     {
+      header: 'Scope',
+      cell: (row) => (row.organization?.id ? row.organization?.name : 'GLOBAL'),
+    },
+    {
       header: 'ID',
       accessor: 'id',
       className: 'font-mono text-xs',
@@ -100,7 +103,7 @@ export default function CategoryList() {
                   id: row.id,
                   payload: {
                     name: nextName.trim(),
-                    organization: { id: Number(form.organizationId) },
+                    organization: row.organization?.id ? { id: Number(row.organization.id) } : null,
                   },
                 });
               }
@@ -140,7 +143,7 @@ export default function CategoryList() {
             label="Organization"
             value={form.organizationId}
             onChange={(e) => setForm((prev) => ({ ...prev, organizationId: e.target.value }))}
-            options={[{ label: 'Select organization', value: '' }, ...organizationOptions]}
+            options={[{ label: 'GLOBAL (All organizations)', value: 'GLOBAL' }, ...organizationOptions]}
           />
           <Input
             label="Category name"
@@ -151,13 +154,13 @@ export default function CategoryList() {
           <Button
             className="gap-2"
             onClick={() => {
-              if (!form.organizationId || !form.name.trim()) {
-                toast.error('Select organization and enter category name');
+              if (!form.name.trim()) {
+                toast.error('Enter category name');
                 return;
               }
               createCategory.mutate({
                 name: form.name.trim(),
-                organization: { id: Number(form.organizationId) },
+                organization: null,
               });
             }}
             isLoading={createCategory.isPending}

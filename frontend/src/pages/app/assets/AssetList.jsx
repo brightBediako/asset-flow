@@ -120,7 +120,7 @@ export default function AssetList() {
   const categoryOptions = useMemo(
     () =>
       (categoriesQuery.data || []).map((category) => ({
-        label: category.name,
+        label: `${category.name}${category.organization?.id ? '' : ' (GLOBAL)'}`,
         value: String(category.id),
       })),
     [categoriesQuery.data]
@@ -283,19 +283,20 @@ export default function AssetList() {
                 onChange={(e) => setForm((prev) => ({ ...prev, pricePerDayGhs: e.target.value }))}
                 placeholder="e.g. 120.00"
               />
-              <Select
-                label="Organization"
-                value={form.organizationId}
-                onChange={(e) => {
-                  const organizationId = e.target.value;
-                  setForm((prev) => ({ ...prev, organizationId, categoryId: '' }));
-                }}
-                options={[
-                  { label: 'Select organization', value: '' },
-                  ...organizationOptions,
-                ]}
-                disabled={isOrgAdmin}
-              />
+              {!isOrgAdmin && (
+                <Select
+                  label="Organization"
+                  value={form.organizationId}
+                  onChange={(e) => {
+                    const organizationId = e.target.value;
+                    setForm((prev) => ({ ...prev, organizationId, categoryId: '' }));
+                  }}
+                  options={[
+                    { label: 'Select organization', value: '' },
+                    ...organizationOptions,
+                  ]}
+                />
+              )}
               <Select
                 label="Category"
                 value={form.categoryId}

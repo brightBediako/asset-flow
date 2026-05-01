@@ -23,7 +23,7 @@ public class AssetCategoryService {
 
     @Transactional(readOnly = true)
     public List<AssetCategory> findByOrganizationId(Long organizationId) {
-        return assetCategoryRepository.findByOrganizationId(organizationId);
+        return assetCategoryRepository.findGlobalAndOrganizationCategories(organizationId);
     }
 
     @Transactional(readOnly = true)
