@@ -27,6 +27,6 @@ export function formatDate(date, pattern = 'MMM dd, yyyy HH:mm') {
 export function formatCurrency(amount) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'GHS',
   }).format(amount);
 }
