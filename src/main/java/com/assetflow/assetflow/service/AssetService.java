@@ -102,8 +102,12 @@ public class AssetService {
     }
 
     private void validateCategoryBelongsToOrganization(Asset asset) {
-        if (asset.getCategory() == null || asset.getCategory().getOrganization() == null) {
-            throw new IllegalArgumentException("Category organization is invalid");
+        if (asset.getCategory() == null) {
+            throw new IllegalArgumentException("Category is invalid");
+        }
+        // Global categories (organization == null) are valid for all organizations.
+        if (asset.getCategory().getOrganization() == null) {
+            return;
         }
         if (!asset.getCategory().getOrganization().getId().equals(asset.getOrganization().getId())) {
             throw new FieldValidationException(

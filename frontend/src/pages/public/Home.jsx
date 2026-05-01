@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowRight, BarChart3, ShieldCheck, Box, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/BaseComponents';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden">
       {/* Navigation */}
@@ -18,10 +21,18 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-6">
             <Link to="/assets" className="text-xs font-black text-[#64748B] hover:text-[#2563EB] uppercase tracking-widest transition-colors">Browse</Link>
-            <Link to="/login" className="text-xs font-black text-[#64748B] hover:text-[#2563EB] uppercase tracking-widest transition-colors">Login</Link>
-            <Link to="/register">
-              <Button size="sm" className="px-6 rounded-lg uppercase tracking-widest text-[11px] font-black">Get Started</Button>
-            </Link>
+            {isAuthenticated ? (
+              <Link to="/app">
+                <Button size="sm" className="px-6 rounded-lg uppercase tracking-widest text-[11px] font-black">Dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="text-xs font-black text-[#64748B] hover:text-[#2563EB] uppercase tracking-widest transition-colors">Login</Link>
+                <Link to="/register">
+                  <Button size="sm" className="px-6 rounded-lg uppercase tracking-widest text-[11px] font-black">Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
