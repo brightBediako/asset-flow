@@ -1,18 +1,5 @@
 # AssetFlow
 
-Laptops
-Mobile Phones
-Monitors
-Networking Equipment
-Printers & Scanners
-Office Furniture
-Meeting Room Equipment
-Vehicles
-Tools & Machinery
-Safety Equipment
-
-
-
 A centralized API for organizations to manage, track, and book shared physical assets. Multi-tenant, role-based, with audit logging.
 
 ## Overview
