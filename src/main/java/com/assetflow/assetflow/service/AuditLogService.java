@@ -15,6 +15,11 @@ public class AuditLogService {
     private final AuditLogRepository auditLogRepository;
 
     @Transactional(readOnly = true)
+    public Page<AuditLog> findAll(Pageable pageable) {
+        return auditLogRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Page<AuditLog> findByOrganizationId(Long organizationId, Pageable pageable) {
         return auditLogRepository.findByOrganizationId(organizationId, pageable);
     }

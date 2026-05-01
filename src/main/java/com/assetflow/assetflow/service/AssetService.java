@@ -70,6 +70,7 @@ public class AssetService {
         if (asset.getDescription() != null) existing.setDescription(asset.getDescription());
         if (asset.getStatus() != null) existing.setStatus(asset.getStatus());
         if (asset.getImageUrl() != null) existing.setImageUrl(asset.getImageUrl());
+        if (asset.getPricePerDayGhs() != null) existing.setPricePerDayGhs(asset.getPricePerDayGhs());
         return assetRepository.save(existing);
     }
 

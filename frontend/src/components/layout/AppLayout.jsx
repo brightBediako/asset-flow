@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Building2, 
+  Tags,
   Users, 
   Box, 
   CalendarClock, 
@@ -49,6 +50,12 @@ export default function AppLayout() {
       href: '/app/assets', 
       icon: Box, 
       roles: [ROLES.SUPER_ADMIN, ROLES.ORG_ADMIN] 
+    },
+    {
+      name: 'Categories',
+      href: '/app/categories',
+      icon: Tags,
+      roles: [ROLES.SUPER_ADMIN]
     },
     { 
       name: 'Bookings', 

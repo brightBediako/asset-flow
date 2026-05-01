@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -73,6 +75,7 @@ public class BookingService {
         validateTimeWindow(booking.getStartTime(), booking.getEndTime());
         ensureNoConflictingBooking(booking.getAsset() != null ? booking.getAsset().getId() : null,
                 booking.getStartTime(), booking.getEndTime());
+        applyPricing(booking);
 
         return bookingRepository.save(booking);
     }
@@ -140,5 +143,21 @@ public class BookingService {
                 throw new IllegalArgumentException("Cannot change status once booking is " + current);
             }
         }
+    }
+
+    private void applyPricing(Booking booking) {
+        if (booking.getAsset() == null || booking.getAsset().getPricePerDayGhs() == null) {
+            throw new IllegalArgumentException("asset.pricePerDayGhs is required");
+        }
+        if (booking.getStartTime() == null || booking.getEndTime() == null) {
+            throw new IllegalArgumentException("startTime and endTime are required");
+        }
+        long durationSeconds = Duration.between(booking.getStartTime(), booking.getEndTime()).getSeconds();
+        int days = (int) Math.ceil(durationSeconds / 86400.0d);
+        if (days < 1) {
+            throw new IllegalArgumentException("Booking duration must be at least 1 day");
+        }
+        booking.setNumberOfDays(days);
+        booking.setTotalPriceGhs(booking.getAsset().getPricePerDayGhs().multiply(BigDecimal.valueOf(days)));
     }
 }

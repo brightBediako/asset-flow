@@ -13,10 +13,7 @@ const schema = yup.object().shape({
   fullName: yup.string().required('Full name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
   password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
-  organizationName: yup.string().when('accountType', {
-    is: 'ORGANIZATION',
-    then: (schema) => schema.required('Organization name is required'),
-  }),
+  location: yup.string().required('Location is required'),
 });
 
 export default function Register() {
@@ -35,7 +32,7 @@ export default function Register() {
       toast.success('Registration successful! Please log in.');
       navigate('/login');
     } catch (error) {
-      // Handled by axios interceptor
+      toast.error('Registration failed');
     }
   };
 
@@ -123,11 +120,18 @@ export default function Register() {
               {...register('password')}
             />
 
+              <Input
+                label="Location"
+                placeholder="e.g. Accra, Ghana"
+                error={errors.location?.message}
+                {...register('location')}
+              />
+
             {accountType === 'ORGANIZATION' && (
               <div className="animate-in fade-in slide-in-from-top-4 duration-300">
                 <Input
-                  label="Organization Name"
-                  placeholder="Acme Corp"
+                  label="Organization Name (Optional)"
+                  placeholder="Acme Corp (auto-generated if blank)"
                   error={errors.organizationName?.message}
                   {...register('organizationName')}
                 />

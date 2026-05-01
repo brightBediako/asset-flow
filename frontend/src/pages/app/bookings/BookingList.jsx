@@ -18,7 +18,7 @@ export default function BookingList() {
     assetId: '',
     userId: '',
     startTime: '',
-    endTime: '',
+    numberOfDays: 1,
   });
 
   const isOrgAdmin = user?.role === 'ORG_ADMIN';
@@ -84,7 +84,7 @@ export default function BookingList() {
         assetId: '',
         userId: '',
         startTime: '',
-        endTime: '',
+        numberOfDays: 1,
       });
     },
   });
@@ -125,19 +125,36 @@ export default function BookingList() {
     [assetsQuery.data]
   );
 
+  const selectedAsset = useMemo(
+    () => (assetsQuery.data || []).find((a) => String(a.id) === String(form.assetId)),
+    [assetsQuery.data, form.assetId]
+  );
+  const estimatedTotal = useMemo(() => {
+    const days = Number(form.numberOfDays || 0);
+    const price = Number(selectedAsset?.pricePerDayGhs || 0);
+    return days > 0 ? days * price : 0;
+  }, [form.numberOfDays, selectedAsset]);
+
   const submitCreate = (e) => {
     e.preventDefault();
     const organizationId = form.organizationId || defaultOrganizationId;
-    if (!organizationId || !form.assetId || !form.userId || !form.startTime || !form.endTime) {
+    if (!organizationId || !form.assetId || !form.userId || !form.startTime || !form.numberOfDays) {
       toast.error('All booking fields are required');
       return;
     }
+    const days = Number(form.numberOfDays);
+    if (Number.isNaN(days) || days < 1) {
+      toast.error('Number of days must be at least 1');
+      return;
+    }
+    const start = new Date(form.startTime);
+    const end = new Date(start.getTime() + days * 24 * 60 * 60 * 1000);
     createBooking.mutate({
       organization: { id: Number(organizationId) },
       asset: { id: Number(form.assetId) },
       user: { id: Number(form.userId) },
-      startTime: new Date(form.startTime).toISOString(),
-      endTime: new Date(form.endTime).toISOString(),
+      startTime: start.toISOString(),
+      endTime: end.toISOString(),
     });
   };
 
@@ -185,6 +202,14 @@ export default function BookingList() {
     {
       header: 'End Date',
       cell: (row) => formatDate(row.endTime),
+    },
+    {
+      header: 'Days',
+      cell: (row) => row.numberOfDays || '-',
+    },
+    {
+      header: 'Total (GHS)',
+      cell: (row) => `GHS ${Number(row.totalPriceGhs || 0).toFixed(2)}`,
     },
     {
       header: 'Status',
@@ -269,12 +294,24 @@ export default function BookingList() {
                   onChange={(e) => setForm((prev) => ({ ...prev, startTime: e.target.value }))}
                 />
                 <Input
-                  label="End"
-                  type="datetime-local"
-                  value={form.endTime}
-                  onChange={(e) => setForm((prev) => ({ ...prev, endTime: e.target.value }))}
+                  label="Number of days"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={form.numberOfDays}
+                  onChange={(e) => setForm((prev) => ({ ...prev, numberOfDays: e.target.value }))}
                 />
               </div>
+            </div>
+            <div className="text-sm text-slate-600">
+              {selectedAsset ? (
+                <>
+                  Price/day: <span className="font-bold">GHS {Number(selectedAsset.pricePerDayGhs || 0).toFixed(2)}</span>
+                  {' '}| Estimated total: <span className="font-bold">GHS {estimatedTotal.toFixed(2)}</span>
+                </>
+              ) : (
+                'Select an asset to see price calculation.'
+              )}
             </div>
             <div className="flex items-center gap-2">
               <Button type="submit" isLoading={createBooking.isPending}>

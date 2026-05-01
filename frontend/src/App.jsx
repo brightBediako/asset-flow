@@ -16,6 +16,7 @@ import Dashboard from './pages/app/Dashboard.jsx';
 import Organizations from './pages/app/organizations/OrganizationList.jsx';
 import Users from './pages/app/users/UserList.jsx';
 import Assets from './pages/app/assets/AssetList.jsx';
+import Categories from './pages/app/categories/CategoryList.jsx';
 import Bookings from './pages/app/bookings/BookingList.jsx';
 import MyBookings from './pages/app/bookings/MyBookings.jsx';
 import Maintenance from './pages/app/maintenance/MaintenanceList.jsx';
@@ -64,6 +65,12 @@ export default function App() {
           <Route path="assets" element={
             <ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ORG_ADMIN]}>
               <Assets />
+            </ProtectedRoute>
+          } />
+
+          <Route path="categories" element={
+            <ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN]}>
+              <Categories />
             </ProtectedRoute>
           } />
           

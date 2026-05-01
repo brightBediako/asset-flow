@@ -34,6 +34,12 @@ public class OrganizationService {
 
     @Transactional
     public Organization create(Organization organization) {
+        if (organization.getName() != null) {
+            organization.setName(organization.getName().trim());
+        }
+        if (organization.getLocation() != null) {
+            organization.setLocation(organization.getLocation().trim());
+        }
         return organizationRepository.save(organization);
     }
 
@@ -41,7 +47,12 @@ public class OrganizationService {
     public Organization update(Long id, Organization organization) {
         Organization existing = organizationRepository.findById(id).orElse(null);
         if (existing == null) return null;
-        existing.setName(organization.getName());
+        if (organization.getName() != null) {
+            existing.setName(organization.getName().trim());
+        }
+        if (organization.getLocation() != null) {
+            existing.setLocation(organization.getLocation().trim());
+        }
         return organizationRepository.save(existing);
     }
 

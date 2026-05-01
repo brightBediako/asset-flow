@@ -19,6 +19,8 @@ export default function AssetList() {
     name: '',
     description: '',
     imageUrl: '',
+    imageFile: null,
+    pricePerDayGhs: '',
     status: ASSET_STATUS.AVAILABLE,
     organizationId: '',
     categoryId: '',
@@ -97,6 +99,8 @@ export default function AssetList() {
       name: '',
       description: '',
       imageUrl: '',
+      imageFile: null,
+      pricePerDayGhs: '',
       status: ASSET_STATUS.AVAILABLE,
       organizationId: isOrgAdmin ? defaultOrganizationId : '',
       categoryId: '',
@@ -129,6 +133,8 @@ export default function AssetList() {
       name: '',
       description: '',
       imageUrl: '',
+      imageFile: null,
+      pricePerDayGhs: '',
       status: ASSET_STATUS.AVAILABLE,
       organizationId: isOrgAdmin ? defaultOrganizationId : '',
       categoryId: '',
@@ -142,13 +148,15 @@ export default function AssetList() {
       name: asset.name || '',
       description: asset.description || '',
       imageUrl: asset.imageUrl || '',
+      imageFile: null,
+      pricePerDayGhs: asset.pricePerDayGhs ?? '',
       status: asset.status || ASSET_STATUS.AVAILABLE,
       organizationId: String(asset.organization?.id || (isOrgAdmin ? defaultOrganizationId : '')),
       categoryId: String(asset.category?.id || ''),
     });
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const organizationId = form.organizationId || defaultOrganizationId;
     if (!form.name.trim()) {
@@ -163,15 +171,34 @@ export default function AssetList() {
       toast.error('Category is required');
       return;
     }
+    if (!form.pricePerDayGhs || Number(form.pricePerDayGhs) <= 0) {
+      toast.error('Price per day (GHS) must be greater than 0');
+      return;
+    }
 
-    upsertAsset.mutate({
-      name: form.name.trim(),
-      description: form.description.trim() || null,
-      imageUrl: form.imageUrl.trim() || null,
-      status: form.status,
-      organization: { id: Number(organizationId) },
-      category: { id: Number(form.categoryId) },
-    });
+    try {
+      let imageUrl = form.imageUrl.trim() || null;
+      if (form.imageFile) {
+        const payload = new FormData();
+        payload.append('file', form.imageFile);
+        const uploadResponse = await apiClient.post('/assets/upload-image', payload, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        imageUrl = uploadResponse.data?.imageUrl || null;
+      }
+
+      await upsertAsset.mutateAsync({
+        name: form.name.trim(),
+        description: form.description.trim() || null,
+        imageUrl,
+        status: form.status,
+        pricePerDayGhs: Number(form.pricePerDayGhs),
+        organization: { id: Number(organizationId) },
+        category: { id: Number(form.categoryId) },
+      });
+    } catch (error) {
+      toast.error('Failed to save asset');
+    }
   };
 
   const columns = [
@@ -195,6 +222,10 @@ export default function AssetList() {
     {
       header: 'Category',
       cell: (row) => row.category?.name || '-',
+    },
+    {
+      header: 'Price/Day (GHS)',
+      cell: (row) => `GHS ${Number(row.pricePerDayGhs || 0).toFixed(2)}`,
     },
     {
       header: 'Updated',
@@ -243,6 +274,15 @@ export default function AssetList() {
                 onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value }))}
                 options={Object.values(ASSET_STATUS).map((status) => ({ label: status, value: status }))}
               />
+              <Input
+                label="Price per day (GHS)"
+                type="number"
+                step="0.01"
+                min="0"
+                value={form.pricePerDayGhs}
+                onChange={(e) => setForm((prev) => ({ ...prev, pricePerDayGhs: e.target.value }))}
+                placeholder="e.g. 120.00"
+              />
               <Select
                 label="Organization"
                 value={form.organizationId}
@@ -270,8 +310,23 @@ export default function AssetList() {
               label="Image URL (optional)"
               value={form.imageUrl}
               onChange={(e) => setForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
-              placeholder="https://example.com/image.jpg"
+              placeholder="/uploads/filename.jpg (auto-filled after upload)"
             />
+            <div className="space-y-1.5">
+              <label htmlFor="asset-image-file" className="text-sm font-medium text-gray-700">Upload Image (optional)</label>
+              <input
+                id="asset-image-file"
+                type="file"
+                accept="image/*"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm transition-all duration-200 focus:border-[#2563EB] focus:ring-4 focus:ring-blue-100 focus:outline-none"
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    imageFile: e.target.files?.[0] || null,
+                  }))
+                }
+              />
+            </div>
             <div className="space-y-1.5">
               <label htmlFor="asset-description" className="text-sm font-medium text-gray-700">Description</label>
               <textarea

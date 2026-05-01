@@ -60,6 +60,14 @@ export default function MyBookings() {
       cell: (row) => <Badge status={row.status}>{row.status}</Badge>
     },
     {
+      header: 'Days',
+      cell: (row) => row.numberOfDays || '-'
+    },
+    {
+      header: 'Total (GHS)',
+      cell: (row) => `GHS ${Number(row.totalPriceGhs || 0).toFixed(2)}`
+    },
+    {
       header: 'Actions',
       className: 'text-right',
       cell: (row) => (

@@ -62,6 +62,9 @@ public class UserService {
             user.setJobTitle(user.getJobTitle().trim());
         }
         user.setPhoneNumber(normalizeAndValidateGhanaPhone(user.getPhoneNumber()));
+        if (user.getLocation() != null) {
+            user.setLocation(user.getLocation().trim());
+        }
         return userRepository.save(user);
     }
 
@@ -80,6 +83,7 @@ public class UserService {
         if (user.getFullName() != null) existing.setFullName(user.getFullName());
         if (user.getJobTitle() != null) existing.setJobTitle(user.getJobTitle().trim());
         if (user.getPhoneNumber() != null) existing.setPhoneNumber(normalizeAndValidateGhanaPhone(user.getPhoneNumber()));
+        if (user.getLocation() != null) existing.setLocation(user.getLocation().trim());
         return userRepository.save(existing);
     }
 

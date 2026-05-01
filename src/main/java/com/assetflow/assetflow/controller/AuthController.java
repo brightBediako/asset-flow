@@ -17,11 +17,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -38,10 +41,14 @@ public class AuthController {
     private final RoleRepository roleRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody @Valid LoginRequest request) {
+    public ResponseEntity<User> login(@RequestBody @Valid LoginRequest request, HttpServletRequest servletRequest) {
         var auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
+        servletRequest.getSession(true)
+                .setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
         User user = userService.findByEmail(request.email());
         return ResponseEntity.ok(user);
     }
@@ -61,20 +68,27 @@ public class AuthController {
         }
 
         Long organizationId = request.organizationId();
+        String location = request.location() == null ? null : request.location().trim();
         if (organizationAccount) {
             String orgName = request.organizationName() == null ? "" : request.organizationName().trim();
             if (orgName.isBlank()) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "organizationName is required for organization registration."));
+                orgName = "ORG-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             }
-            Organization createdOrganization = organizationService.create(Organization.builder().name(orgName).build());
+            Organization createdOrganization = organizationService.create(
+                    Organization.builder().name(orgName).location(location).build());
             organizationId = createdOrganization.getId();
+        } else if (organizationId == null) {
+            String generatedName = request.fullName().trim() + " Workspace";
+            Organization generatedOrganization = organizationService.create(
+                    Organization.builder().name(generatedName).location(location).build());
+            organizationId = generatedOrganization.getId();
         }
 
         User user = new User();
         user.setEmail(request.email());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setFullName(request.fullName());
+        user.setLocation(location);
         user.setRole(Role.builder().id(roleId).build());
         if (organizationId != null) {
             user.setOrganization(Organization.builder().id(organizationId).build());

@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +39,10 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getById(@PathVariable Long id) {
+    public ResponseEntity<User> getById(@PathVariable Long id, Authentication authentication) {
+        if (!isAdmin(authentication) && !isCurrentUser(authentication, id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         User user = userService.findById(id);
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
@@ -48,7 +53,10 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user, Authentication authentication) {
+        if (!isAdmin(authentication) && !isCurrentUser(authentication, id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         User updated = userService.update(id, user);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
@@ -56,5 +64,22 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         return userService.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    private boolean isAdmin(Authentication authentication) {
+        if (authentication == null) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> "SUPER_ADMIN".equals(authority.getAuthority())
+                        || "ORG_ADMIN".equals(authority.getAuthority()));
+    }
+
+    private boolean isCurrentUser(Authentication authentication, Long id) {
+        if (authentication == null || authentication.getName() == null || id == null) {
+            return false;
+        }
+        User current = userService.findByEmail(authentication.getName());
+        return current != null && id.equals(current.getId());
     }
 }

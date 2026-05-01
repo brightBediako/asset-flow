@@ -21,6 +21,9 @@ public class Organization {
     @Column(nullable = false, length = 255)
     private String name;
 
+    @Column(length = 255)
+    private String location;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
