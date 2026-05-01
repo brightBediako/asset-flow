@@ -8,6 +8,7 @@ import com.assetflow.assetflow.entity.User;
 import com.assetflow.assetflow.repository.RoleRepository;
 import com.assetflow.assetflow.service.OrganizationService;
 import com.assetflow.assetflow.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -116,5 +117,15 @@ public class AuthController {
         String email = authentication.getName();
         User user = userService.findByEmail(email);
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.status(401).build();
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
+        var session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 }

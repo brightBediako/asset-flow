@@ -1,6 +1,7 @@
 package com.assetflow.assetflow.service;
 
 import com.assetflow.assetflow.entity.User;
+import com.assetflow.assetflow.exception.FieldValidationException;
 import com.assetflow.assetflow.repository.OrganizationRepository;
 import com.assetflow.assetflow.repository.RoleRepository;
 import com.assetflow.assetflow.repository.UserRepository;
@@ -11,10 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private static final Pattern GHANA_PHONE_PATTERN = Pattern.compile("^(?:\\+233|0)\\d{9}$");
 
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
@@ -32,7 +36,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Page<User> search(Long organizationId, String query, Pageable pageable) {
-        String normalizedQuery = (query == null || query.isBlank()) ? null : query.trim();
+        String normalizedQuery = (query == null || query.isBlank()) ? "" : query.trim();
         return userRepository.search(organizationId, normalizedQuery, pageable);
     }
 
@@ -54,6 +58,10 @@ public class UserService {
         if (user.getRole() != null && user.getRole().getId() != null) {
             user.setRole(roleRepository.findById(user.getRole().getId()).orElseThrow());
         }
+        if (user.getJobTitle() != null) {
+            user.setJobTitle(user.getJobTitle().trim());
+        }
+        user.setPhoneNumber(normalizeAndValidateGhanaPhone(user.getPhoneNumber()));
         return userRepository.save(user);
     }
 
@@ -70,6 +78,8 @@ public class UserService {
         if (user.getEmail() != null) existing.setEmail(user.getEmail());
         if (user.getPasswordHash() != null) existing.setPasswordHash(user.getPasswordHash());
         if (user.getFullName() != null) existing.setFullName(user.getFullName());
+        if (user.getJobTitle() != null) existing.setJobTitle(user.getJobTitle().trim());
+        if (user.getPhoneNumber() != null) existing.setPhoneNumber(normalizeAndValidateGhanaPhone(user.getPhoneNumber()));
         return userRepository.save(existing);
     }
 
@@ -78,5 +88,22 @@ public class UserService {
         if (!userRepository.existsById(id)) return false;
         userRepository.deleteById(id);
         return true;
+    }
+
+    private String normalizeAndValidateGhanaPhone(String rawPhoneNumber) {
+        if (rawPhoneNumber == null) {
+            return null;
+        }
+        String normalized = rawPhoneNumber.trim().replaceAll("\\s+", "");
+        if (normalized.isBlank()) {
+            return null;
+        }
+        if (!GHANA_PHONE_PATTERN.matcher(normalized).matches()) {
+            throw new FieldValidationException(
+                    "Request validation failed",
+                    Map.of("phoneNumber", "Phone number must be a valid Ghana format (0XXXXXXXXX or +233XXXXXXXXX)")
+            );
+        }
+        return normalized;
     }
 }

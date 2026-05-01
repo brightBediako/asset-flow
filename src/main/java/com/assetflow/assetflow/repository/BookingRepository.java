@@ -30,7 +30,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             WHERE (:organizationId IS NULL OR b.organization.id = :organizationId)
               AND (:userId IS NULL OR b.user.id = :userId)
               AND (
-                :query IS NULL
+                :query = ''
                 OR LOWER(COALESCE(b.asset.name, '')) LIKE LOWER(CONCAT('%', :query, '%'))
                 OR LOWER(COALESCE(b.user.fullName, '')) LIKE LOWER(CONCAT('%', :query, '%'))
                 OR LOWER(CAST(b.status AS string)) LIKE LOWER(CONCAT('%', :query, '%'))

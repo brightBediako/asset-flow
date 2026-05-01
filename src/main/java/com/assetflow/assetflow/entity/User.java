@@ -37,6 +37,12 @@ public class User {
     @Column(name = "full_name", length = 255)
     private String fullName;
 
+    @Column(name = "job_title", length = 120)
+    private String jobTitle;
+
+    @Column(name = "phone_number", length = 40)
+    private String phoneNumber;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 

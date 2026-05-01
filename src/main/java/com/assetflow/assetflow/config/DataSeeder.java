@@ -8,6 +8,7 @@ import com.assetflow.assetflow.repository.RoleRepository;
 import com.assetflow.assetflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,12 @@ public class DataSeeder {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${app.seed.admin.email}")
+    private String seedAdminEmail;
+
+    @Value("${app.seed.admin.password}")
+    private String seedAdminPassword;
+
     @Bean
     @Order(1)
     public CommandLineRunner seedData() {
@@ -43,16 +50,16 @@ public class DataSeeder {
                     ? organizationRepository.save(Organization.builder().name("Default Organization").build())
                     : organizationRepository.findAll().get(0);
 
-            if (userRepository.findByEmail("admin@gmail.com").isEmpty()) {
+            if (userRepository.findByEmail(seedAdminEmail).isEmpty()) {
                 User admin = User.builder()
-                        .email("admin@gmail.com")
-                        .passwordHash(passwordEncoder.encode("admin123"))
+                        .email(seedAdminEmail)
+                        .passwordHash(passwordEncoder.encode(seedAdminPassword))
                         .fullName("System Admin")
                         .role(superAdmin)
                         .organization(org)
                         .build();
                 userRepository.save(admin);
-                log.info("Seeded initial SUPER_ADMIN user: admin@gmail.com");
+                log.info("Seeded initial SUPER_ADMIN user: {}", seedAdminEmail);
             }
         };
     }

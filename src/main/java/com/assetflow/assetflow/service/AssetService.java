@@ -34,7 +34,7 @@ public class AssetService {
 
     @Transactional(readOnly = true)
     public Page<Asset> search(Long organizationId, String query, Pageable pageable) {
-        String normalizedQuery = (query == null || query.isBlank()) ? null : query.trim();
+        String normalizedQuery = (query == null || query.isBlank()) ? "" : query.trim();
         return assetRepository.search(organizationId, normalizedQuery, pageable);
     }
 

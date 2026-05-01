@@ -28,7 +28,7 @@ public class OrganizationService {
 
     @Transactional(readOnly = true)
     public Page<Organization> search(String query, Pageable pageable) {
-        String normalizedQuery = (query == null || query.isBlank()) ? null : query.trim();
+        String normalizedQuery = (query == null || query.isBlank()) ? "" : query.trim();
         return organizationRepository.search(normalizedQuery, pageable);
     }
 

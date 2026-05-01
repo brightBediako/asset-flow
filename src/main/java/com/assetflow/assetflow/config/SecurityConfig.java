@@ -34,12 +34,14 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        // Public catalog browsing endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/assets", "/api/assets/**").permitAll()
                         // Read access for any authenticated user; write requires SUPER_ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/roles", "/api/roles/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/users", "/api/users/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/organizations", "/api/organizations/**").authenticated()
                         .requestMatchers("/api/roles/**").hasAuthority("SUPER_ADMIN")
-                        .requestMatchers("/api/users/**").hasAuthority("SUPER_ADMIN")
+                        .requestMatchers("/api/users/**").hasAnyAuthority("SUPER_ADMIN", "ORG_ADMIN")
                         .requestMatchers("/api/organizations/**").hasAuthority("SUPER_ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated());

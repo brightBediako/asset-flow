@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
 import ListLayout from '@/components/common/ListLayout';
 import { Badge, Button } from '@/components/ui/BaseComponents';
 import { formatDate } from '@/lib/utils';
 import { CalendarX, Clock, History } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function MyBookings() {
-  const [params, setParams] = useState({ page: 0, size: 10, search: '' });
+  const queryClient = useQueryClient();
+  const [params, setParams] = useState({ page: 0, size: 10, q: '' });
 
   const { data, isLoading } = useQuery({
     queryKey: ['my-bookings', params],
@@ -18,13 +20,24 @@ export default function MyBookings() {
     },
   });
 
+  const cancelBooking = useMutation({
+    mutationFn: async (id) => {
+      await apiClient.delete(`/bookings/${id}`);
+    },
+    onSuccess: () => {
+      toast.success('Booking cancelled');
+      queryClient.invalidateQueries({ queryKey: ['my-bookings'] });
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+    },
+  });
+
   const columns = [
     {
       header: 'Asset',
       cell: (row) => (
         <div className="flex flex-col">
-          <span className="font-bold text-slate-900">{row.assetName}</span>
-          <span className="text-[10px] text-slate-400 font-mono italic">#{row.assetId}</span>
+          <span className="font-bold text-slate-900">{row.asset?.name || '-'}</span>
+          <span className="text-[10px] text-slate-400 font-mono italic">#{row.asset?.id || '-'}</span>
         </div>
       )
     },
@@ -33,11 +46,11 @@ export default function MyBookings() {
       cell: (row) => (
         <div className="text-sm">
            <div className="flex items-center gap-1.5 text-slate-600">
-             <Clock className="h-3 w-3" /> {formatDate(row.startDate)}
+             <Clock className="h-3 w-3" /> {formatDate(row.startTime)}
            </div>
            <div className="flex items-center gap-1.5 text-slate-400 mt-1">
              <div className="w-3 h-0.5 bg-slate-200 ml-1.5"></div>
-             {formatDate(row.endDate)}
+             {formatDate(row.endTime)}
            </div>
         </div>
       )
@@ -52,7 +65,16 @@ export default function MyBookings() {
       cell: (row) => (
         <div className="flex items-center justify-end gap-2">
            {(row.status === 'PENDING' || row.status === 'APPROVED') && (
-             <Button variant="outline" size="sm" className="h-8 text-rose-600 hover:bg-rose-50 border-rose-100 gap-1.5">
+             <Button
+               variant="outline"
+               size="sm"
+               className="h-8 text-rose-600 hover:bg-rose-50 border-rose-100 gap-1.5"
+               onClick={() => {
+                 if (globalThis.confirm('Cancel this booking?')) {
+                   cancelBooking.mutate(row.id);
+                 }
+               }}
+             >
                <CalendarX className="h-4 w-4" /> Cancel
              </Button>
            )}
@@ -69,7 +91,7 @@ export default function MyBookings() {
       title="My Reservations"
       subtitle="Track and manage assets you have booked or currently possess."
       searchPlaceholder="Search your bookings..."
-      onSearch={(v) => setParams(p => ({ ...p, search: v, page: 0 }))}
+      onSearch={(v) => setParams(p => ({ ...p, q: v, page: 0 }))}
       isLoading={isLoading}
       data={data?.content || []}
       pagination={data}

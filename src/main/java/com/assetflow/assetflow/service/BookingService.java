@@ -46,7 +46,7 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public Page<Booking> search(Long organizationId, Long userId, String query, Pageable pageable) {
-        String normalizedQuery = (query == null || query.isBlank()) ? null : query.trim();
+        String normalizedQuery = (query == null || query.isBlank()) ? "" : query.trim();
         return bookingRepository.search(organizationId, userId, normalizedQuery, pageable);
     }
 
