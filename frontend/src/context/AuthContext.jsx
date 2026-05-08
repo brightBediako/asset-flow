@@ -10,6 +10,8 @@ function normalizeUser(rawUser) {
     // Keep frontend shape stable across backend payload variations.
     name: rawUser.name ?? rawUser.fullName ?? '',
     role: typeof rawUser.role === 'string' ? rawUser.role : rawUser.role?.name ?? '',
+    roleId: rawUser.role?.id ?? rawUser.roleId ?? null,
+    organizationId: rawUser.organization?.id ?? rawUser.organizationId ?? null,
   };
 }
 

@@ -1,6 +1,7 @@
 package com.assetflow.assetflow.controller;
 
 import com.assetflow.assetflow.entity.Booking;
+import com.assetflow.assetflow.entity.User;
 import com.assetflow.assetflow.service.BookingService;
 import com.assetflow.assetflow.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -45,9 +46,21 @@ public class BookingController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             Authentication authentication) {
-        boolean admin = isAdmin(authentication);
-        Long effectiveUserId = admin ? userId : currentUserId(authentication);
-        Long effectiveOrganizationId = admin ? organizationId : null;
+        boolean superAdmin = hasRole(authentication, "SUPER_ADMIN");
+        boolean orgAdmin = hasRole(authentication, "ORG_ADMIN");
+
+        Long effectiveUserId;
+        Long effectiveOrganizationId;
+        if (superAdmin) {
+            effectiveUserId = userId;
+            effectiveOrganizationId = organizationId;
+        } else if (orgAdmin) {
+            effectiveUserId = userId;
+            effectiveOrganizationId = organizationId != null ? organizationId : currentOrganizationId(authentication);
+        } else {
+            effectiveUserId = currentUserId(authentication);
+            effectiveOrganizationId = null;
+        }
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         return ResponseEntity.ok(bookingService.search(effectiveOrganizationId, effectiveUserId, query, pageable));
     }
@@ -95,12 +108,15 @@ public class BookingController {
     }
 
     private boolean isAdmin(Authentication authentication) {
+        return hasRole(authentication, "SUPER_ADMIN") || hasRole(authentication, "ORG_ADMIN");
+    }
+
+    private boolean hasRole(Authentication authentication, String role) {
         if (authentication == null) {
             return false;
         }
         return authentication.getAuthorities().stream()
-                .anyMatch(authority -> "SUPER_ADMIN".equals(authority.getAuthority())
-                        || "ORG_ADMIN".equals(authority.getAuthority()));
+                .anyMatch(authority -> role.equals(authority.getAuthority()));
     }
 
     private Long currentUserId(Authentication authentication) {
@@ -117,5 +133,13 @@ public class BookingController {
             return false;
         }
         return userId.equals(booking.getUser().getId());
+    }
+
+    private Long currentOrganizationId(Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return null;
+        }
+        User current = userService.findByEmail(authentication.getName());
+        return current != null && current.getOrganization() != null ? current.getOrganization().getId() : null;
     }
 }

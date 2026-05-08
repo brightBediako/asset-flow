@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Box, Lock, Mail } from 'lucide-react';
+import { Box } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button, Input, Card } from '@/components/ui/BaseComponents';
 import toast from 'react-hot-toast';
@@ -14,33 +14,37 @@ const schema = yup.object().shape({
 });
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get('redirect') || '/app';
+
+  useEffect(() => {
+    if (loading) return;
+    if (isAuthenticated) {
+      navigate(redirect, { replace: true });
+    }
+  }, [isAuthenticated, loading, navigate, redirect]);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: yupResolver(schema),
   });
 
   const onSubmit = async (data) => {
-    try {
-      const user = await login(data);
-      toast.success(`Welcome back, ${user.name}!`);
-      
-      // Role-aware initial redirect if no explicit redirect param
-      if (!searchParams.get('redirect')) {
-        if (user.role === 'USER') {
-          navigate('/app/profile');
-        } else {
-          navigate('/app');
-        }
+    const user = await login(data);
+    toast.success(`Welcome back, ${user.name}!`);
+
+    // Role-aware initial redirect if no explicit redirect param
+    if (!searchParams.get('redirect')) {
+      if (user.role === 'USER') {
+        navigate('/app/profile');
       } else {
-        navigate(redirect);
+        navigate('/app');
       }
-    } catch (error) {
-      // Errors handled by axios interceptor
+      return;
     }
+
+    navigate(redirect);
   };
 
   return (
@@ -51,25 +55,25 @@ export default function Login() {
             <div className="bg-[#2563EB] p-2 rounded-xl group-hover:rotate-12 transition-transform duration-300 shadow-lg shadow-blue-500/20">
               <Box className="h-7 w-7 text-white" />
             </div>
-            <span className="text-2xl font-black text-[#0F172A] tracking-tighter uppercase italic">AssetFlow</span>
+            <span className="text-2xl font-black text-[#0F172A] tracking-tighter uppercase italic">AssetFlow</span><p> | System Login</p>
           </Link>
-          <h2 className="text-3xl font-black text-[#0F172A] tracking-tight">System Login</h2>
+          {/* <h2 className="text-3xl font-black text-[#0F172A] tracking-tight">System Login</h2> */}
           <p className="mt-2 text-[13px] font-medium text-[#64748B] uppercase tracking-widest">Enterprise Asset Management</p>
         </div>
 
         <Card className="shadow-[0_20px_50px_rgba(37,99,235,0.05)] border-t-[6px] border-t-[#2563EB] p-2">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <Input
-              label="CREDENTIAL ID"
+              label="Email Address"
               type="email"
-              placeholder="e.g. admin@assetflow.com"
+              placeholder="e.g. user@gmail.com"
               className="uppercase-label"
               autoComplete="email"
               error={errors.email?.message}
               {...register('email')}
             />
             <Input
-              label="SECURE ACCESS KEY"
+              label="Password"
               type="password"
               placeholder="••••••••"
               autoComplete="current-password"
@@ -82,11 +86,13 @@ export default function Login() {
                 <label htmlFor="remember-me" className="ml-2 block text-xs font-bold text-[#64748B] uppercase tracking-wider">Keep Logged In</label>
               </div>
               <div className="text-xs">
-                <a href="#" className="font-bold text-[#2563EB] hover:text-blue-700 uppercase tracking-wider">Lost Key?</a>
+                <button type="button" className="font-bold text-[#2563EB] hover:text-blue-700 uppercase tracking-wider">
+                  Forgot Password?
+                </button>
               </div>
             </div>
             <Button type="submit" className="w-full h-12 text-sm uppercase tracking-widest font-black" isLoading={isSubmitting}>
-              Initialize Access
+              Login
             </Button>
           </form>
         </Card>
@@ -94,7 +100,7 @@ export default function Login() {
         <p className="text-center text-xs font-bold text-[#64748B] uppercase tracking-widest">
           New to the floor?{' '}
           <Link to="/register" className="text-[#2563EB] hover:text-blue-700 underline underline-offset-4">
-            Request Credentials
+            Create Account
           </Link>
         </p>
       </div>

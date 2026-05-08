@@ -18,6 +18,7 @@ public record RegisterRequest(
 
         String accountType,
         String organizationName,
+        String location,
         Long roleId,
         Long organizationId
 ) {

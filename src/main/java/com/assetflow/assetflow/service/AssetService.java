@@ -34,7 +34,7 @@ public class AssetService {
 
     @Transactional(readOnly = true)
     public Page<Asset> search(Long organizationId, String query, Pageable pageable) {
-        String normalizedQuery = (query == null || query.isBlank()) ? null : query.trim();
+        String normalizedQuery = (query == null || query.isBlank()) ? "" : query.trim();
         return assetRepository.search(organizationId, normalizedQuery, pageable);
     }
 
@@ -70,6 +70,7 @@ public class AssetService {
         if (asset.getDescription() != null) existing.setDescription(asset.getDescription());
         if (asset.getStatus() != null) existing.setStatus(asset.getStatus());
         if (asset.getImageUrl() != null) existing.setImageUrl(asset.getImageUrl());
+        if (asset.getPricePerDayGhs() != null) existing.setPricePerDayGhs(asset.getPricePerDayGhs());
         return assetRepository.save(existing);
     }
 
@@ -101,8 +102,12 @@ public class AssetService {
     }
 
     private void validateCategoryBelongsToOrganization(Asset asset) {
-        if (asset.getCategory() == null || asset.getCategory().getOrganization() == null) {
-            throw new IllegalArgumentException("Category organization is invalid");
+        if (asset.getCategory() == null) {
+            throw new IllegalArgumentException("Category is invalid");
+        }
+        // Global categories (organization == null) are valid for all organizations.
+        if (asset.getCategory().getOrganization() == null) {
+            return;
         }
         if (!asset.getCategory().getOrganization().getId().equals(asset.getOrganization().getId())) {
             throw new FieldValidationException(

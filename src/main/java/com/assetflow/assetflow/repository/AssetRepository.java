@@ -21,7 +21,7 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
             FROM Asset a
             WHERE (:organizationId IS NULL OR a.organization.id = :organizationId)
               AND (
-                :query IS NULL
+                :query = ''
                 OR LOWER(a.name) LIKE LOWER(CONCAT('%', :query, '%'))
                 OR LOWER(COALESCE(a.description, '')) LIKE LOWER(CONCAT('%', :query, '%'))
                 OR LOWER(COALESCE(a.category.name, '')) LIKE LOWER(CONCAT('%', :query, '%'))

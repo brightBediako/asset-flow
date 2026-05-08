@@ -18,7 +18,7 @@ export default function Dashboard() {
   const { user } = useAuth();
 
   // Fetch summary stats
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       const [assetsResp, usersResp, bookingsResp, maintenanceResp] = await Promise.all([

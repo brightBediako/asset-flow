@@ -6,9 +6,9 @@ export const ROLES = {
 
 export const ASSET_STATUS = {
   AVAILABLE: 'AVAILABLE',
+  RESERVED: 'RESERVED',
   IN_USE: 'IN_USE',
-  MAINTENANCE: 'MAINTENANCE',
-  RETIRED: 'RETIRED',
+  UNDER_MAINTENANCE: 'UNDER_MAINTENANCE',
 };
 
 export const BOOKING_STATUS = {
@@ -22,9 +22,9 @@ export const BOOKING_STATUS = {
 export const STATUS_COLORS = {
   // Asset Statuses (Matching theme badges)
   AVAILABLE: 'bg-[#DCFCE7] text-[#166534] border-[#d1fae5]',
+  RESERVED: 'bg-[#FDE68A] text-[#92400E] border-[#fde68a]',
   IN_USE: 'bg-[#DBEAFE] text-[#1E40AF] border-[#dbeafe]',
-  MAINTENANCE: 'bg-[#FEF9C3] text-[#854D0E] border-[#fef9c3]',
-  RETIRED: 'bg-[#F1F5F9] text-[#475569] border-[#e2e8f0]',
+  UNDER_MAINTENANCE: 'bg-[#FEF9C3] text-[#854D0E] border-[#fef9c3]',
 
   // Booking Statuses
   PENDING: 'bg-[#DBEAFE] text-[#1E40AF] border-[#dbeafe]',

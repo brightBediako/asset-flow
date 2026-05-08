@@ -23,7 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             FROM User u
             WHERE (:organizationId IS NULL OR u.organization.id = :organizationId)
               AND (
-                :query IS NULL
+                :query = ''
                 OR LOWER(COALESCE(u.fullName, '')) LIKE LOWER(CONCAT('%', :query, '%'))
                 OR LOWER(COALESCE(u.email, '')) LIKE LOWER(CONCAT('%', :query, '%'))
                 OR LOWER(COALESCE(u.role.name, '')) LIKE LOWER(CONCAT('%', :query, '%'))

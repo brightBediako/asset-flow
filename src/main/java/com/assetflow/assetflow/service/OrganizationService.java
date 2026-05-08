@@ -28,12 +28,24 @@ public class OrganizationService {
 
     @Transactional(readOnly = true)
     public Page<Organization> search(String query, Pageable pageable) {
-        String normalizedQuery = (query == null || query.isBlank()) ? null : query.trim();
+        String normalizedQuery = (query == null || query.isBlank()) ? "" : query.trim();
         return organizationRepository.search(normalizedQuery, pageable);
     }
 
     @Transactional
     public Organization create(Organization organization) {
+        if (organization.getName() != null) {
+            organization.setName(organization.getName().trim());
+        }
+        if (organization.getLocation() != null) {
+            organization.setLocation(organization.getLocation().trim());
+        }
+        if (organization.getContactEmail() != null) {
+            organization.setContactEmail(organization.getContactEmail().trim());
+        }
+        if (organization.getContactPhoneNumber() != null) {
+            organization.setContactPhoneNumber(organization.getContactPhoneNumber().trim());
+        }
         return organizationRepository.save(organization);
     }
 
@@ -41,7 +53,18 @@ public class OrganizationService {
     public Organization update(Long id, Organization organization) {
         Organization existing = organizationRepository.findById(id).orElse(null);
         if (existing == null) return null;
-        existing.setName(organization.getName());
+        if (organization.getName() != null) {
+            existing.setName(organization.getName().trim());
+        }
+        if (organization.getLocation() != null) {
+            existing.setLocation(organization.getLocation().trim());
+        }
+        if (organization.getContactEmail() != null) {
+            existing.setContactEmail(organization.getContactEmail().trim());
+        }
+        if (organization.getContactPhoneNumber() != null) {
+            existing.setContactPhoneNumber(organization.getContactPhoneNumber().trim());
+        }
         return organizationRepository.save(existing);
     }
 

@@ -2,6 +2,7 @@ package com.assetflow.assetflow.service;
 
 import com.assetflow.assetflow.entity.Booking;
 import com.assetflow.assetflow.entity.BookingStatus;
+import com.assetflow.assetflow.entity.AssetStatus;
 import com.assetflow.assetflow.repository.AssetRepository;
 import com.assetflow.assetflow.repository.BookingRepository;
 import com.assetflow.assetflow.repository.OrganizationRepository;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -46,7 +49,7 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public Page<Booking> search(Long organizationId, Long userId, String query, Pageable pageable) {
-        String normalizedQuery = (query == null || query.isBlank()) ? null : query.trim();
+        String normalizedQuery = (query == null || query.isBlank()) ? "" : query.trim();
         return bookingRepository.search(organizationId, userId, normalizedQuery, pageable);
     }
 
@@ -57,6 +60,9 @@ public class BookingService {
 
     @Transactional
     public Booking create(Booking booking) {
+        if (booking.getStatus() == null) {
+            booking.setStatus(BookingStatus.PENDING);
+        }
         if (booking.getOrganization() != null && booking.getOrganization().getId() != null) {
             booking.setOrganization(organizationRepository.findById(booking.getOrganization().getId()).orElseThrow());
         }
@@ -74,6 +80,19 @@ public class BookingService {
         ensureNoConflictingBooking(booking.getAsset() != null ? booking.getAsset().getId() : null,
                 booking.getStartTime(), booking.getEndTime());
 
+        if (booking.getAsset() == null || booking.getAsset().getStatus() == null) {
+            throw new IllegalArgumentException("asset.status is required");
+        }
+        if (booking.getAsset().getStatus() != AssetStatus.AVAILABLE) {
+            throw new IllegalArgumentException("Asset is not available for booking");
+        }
+
+        applyPricing(booking);
+
+        // Lock asset while booking is pending to prevent new bookings from UI.
+        booking.getAsset().setStatus(AssetStatus.RESERVED);
+        assetRepository.save(booking.getAsset());
+
         return bookingRepository.save(booking);
     }
 
@@ -83,8 +102,19 @@ public class BookingService {
         if (existing == null) return null;
 
         if (booking.getStatus() != null) {
-            validateStatusTransition(existing.getStatus(), booking.getStatus());
-            existing.setStatus(booking.getStatus());
+            BookingStatus next = booking.getStatus();
+            validateStatusTransition(existing.getStatus(), next);
+            existing.setStatus(next);
+
+            if (existing.getAsset() != null) {
+                if (next == BookingStatus.APPROVED) {
+                    existing.getAsset().setStatus(AssetStatus.IN_USE);
+                    assetRepository.save(existing.getAsset());
+                } else if (next == BookingStatus.REJECTED || next == BookingStatus.COMPLETED) {
+                    existing.getAsset().setStatus(AssetStatus.AVAILABLE);
+                    assetRepository.save(existing.getAsset());
+                }
+            }
         }
         if (booking.getCheckedInAt() != null) existing.setCheckedInAt(booking.getCheckedInAt());
         if (booking.getCheckedOutAt() != null) existing.setCheckedOutAt(booking.getCheckedOutAt());
@@ -96,8 +126,15 @@ public class BookingService {
 
     @Transactional
     public boolean delete(Long id) {
-        if (!bookingRepository.existsById(id)) return false;
+        Booking existing = bookingRepository.findById(id).orElse(null);
+        if (existing == null) return false;
         bookingRepository.deleteById(id);
+
+        // If a pending booking is removed, make the asset available again.
+        if (existing.getStatus() == BookingStatus.PENDING && existing.getAsset() != null) {
+            existing.getAsset().setStatus(AssetStatus.AVAILABLE);
+            assetRepository.save(existing.getAsset());
+        }
         return true;
     }
 
@@ -140,5 +177,21 @@ public class BookingService {
                 throw new IllegalArgumentException("Cannot change status once booking is " + current);
             }
         }
+    }
+
+    private void applyPricing(Booking booking) {
+        if (booking.getAsset() == null || booking.getAsset().getPricePerDayGhs() == null) {
+            throw new IllegalArgumentException("asset.pricePerDayGhs is required");
+        }
+        if (booking.getStartTime() == null || booking.getEndTime() == null) {
+            throw new IllegalArgumentException("startTime and endTime are required");
+        }
+        long durationSeconds = Duration.between(booking.getStartTime(), booking.getEndTime()).getSeconds();
+        int days = (int) Math.ceil(durationSeconds / 86400.0d);
+        if (days < 1) {
+            throw new IllegalArgumentException("Booking duration must be at least 1 day");
+        }
+        booking.setNumberOfDays(days);
+        booking.setTotalPriceGhs(booking.getAsset().getPricePerDayGhs().multiply(BigDecimal.valueOf(days)));
     }
 }

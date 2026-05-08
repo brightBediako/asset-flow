@@ -11,7 +11,7 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
     @Query("""
             SELECT o
             FROM Organization o
-            WHERE (:query IS NULL
+            WHERE (:query = ''
               OR LOWER(COALESCE(o.name, '')) LIKE LOWER(CONCAT('%', :query, '%'))
               OR LOWER(CAST(o.id AS string)) LIKE LOWER(CONCAT('%', :query, '%')))
             """)

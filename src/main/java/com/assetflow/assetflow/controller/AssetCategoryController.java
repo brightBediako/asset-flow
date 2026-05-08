@@ -4,6 +4,7 @@ import com.assetflow.assetflow.entity.AssetCategory;
 import com.assetflow.assetflow.service.AssetCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,12 +31,20 @@ public class AssetCategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<AssetCategory> create(@RequestBody AssetCategory category) {
+    public ResponseEntity<AssetCategory> create(@RequestBody AssetCategory category, Authentication authentication) {
+        if (isSuperAdmin(authentication)) {
+            // Categories created by system admin are global for all organizations.
+            category.setOrganization(null);
+        }
         return ResponseEntity.ok(assetCategoryService.create(category));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AssetCategory> update(@PathVariable Long id, @RequestBody AssetCategory category) {
+    public ResponseEntity<AssetCategory> update(@PathVariable Long id, @RequestBody AssetCategory category, Authentication authentication) {
+        if (isSuperAdmin(authentication) && category.getOrganization() != null) {
+            // Prevent accidental scope narrowing by system admin.
+            category.setOrganization(null);
+        }
         AssetCategory updated = assetCategoryService.update(id, category);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
@@ -43,5 +52,13 @@ public class AssetCategoryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         return assetCategoryService.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    private boolean isSuperAdmin(Authentication authentication) {
+        if (authentication == null) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> "SUPER_ADMIN".equals(a.getAuthority()));
     }
 }

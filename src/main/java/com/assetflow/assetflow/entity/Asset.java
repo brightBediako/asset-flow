@@ -3,6 +3,7 @@ package com.assetflow.assetflow.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
@@ -39,6 +40,10 @@ public class Asset {
 
     @Column(name = "image_url", length = 500)
     private String imageUrl;
+
+    @Column(name = "price_per_day_ghs", precision = 12, scale = 2, nullable = false)
+    @Builder.Default
+    private BigDecimal pricePerDayGhs = BigDecimal.ZERO;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

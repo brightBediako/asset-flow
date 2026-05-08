@@ -3,6 +3,7 @@ package com.assetflow.assetflow.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
@@ -39,6 +40,14 @@ public class Booking {
 
     @Column(name = "end_time", nullable = false)
     private Instant endTime;
+
+    @Column(name = "number_of_days", nullable = false)
+    @Builder.Default
+    private Integer numberOfDays = 1;
+
+    @Column(name = "total_price_ghs", precision = 12, scale = 2, nullable = false)
+    @Builder.Default
+    private BigDecimal totalPriceGhs = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
