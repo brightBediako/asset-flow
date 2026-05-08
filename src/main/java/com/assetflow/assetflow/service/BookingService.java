@@ -2,6 +2,7 @@ package com.assetflow.assetflow.service;
 
 import com.assetflow.assetflow.entity.Booking;
 import com.assetflow.assetflow.entity.BookingStatus;
+import com.assetflow.assetflow.entity.AssetStatus;
 import com.assetflow.assetflow.repository.AssetRepository;
 import com.assetflow.assetflow.repository.BookingRepository;
 import com.assetflow.assetflow.repository.OrganizationRepository;
@@ -78,7 +79,19 @@ public class BookingService {
         validateTimeWindow(booking.getStartTime(), booking.getEndTime());
         ensureNoConflictingBooking(booking.getAsset() != null ? booking.getAsset().getId() : null,
                 booking.getStartTime(), booking.getEndTime());
+
+        if (booking.getAsset() == null || booking.getAsset().getStatus() == null) {
+            throw new IllegalArgumentException("asset.status is required");
+        }
+        if (booking.getAsset().getStatus() != AssetStatus.AVAILABLE) {
+            throw new IllegalArgumentException("Asset is not available for booking");
+        }
+
         applyPricing(booking);
+
+        // Lock asset while booking is pending to prevent new bookings from UI.
+        booking.getAsset().setStatus(AssetStatus.RESERVED);
+        assetRepository.save(booking.getAsset());
 
         return bookingRepository.save(booking);
     }
@@ -89,8 +102,19 @@ public class BookingService {
         if (existing == null) return null;
 
         if (booking.getStatus() != null) {
-            validateStatusTransition(existing.getStatus(), booking.getStatus());
-            existing.setStatus(booking.getStatus());
+            BookingStatus next = booking.getStatus();
+            validateStatusTransition(existing.getStatus(), next);
+            existing.setStatus(next);
+
+            if (existing.getAsset() != null) {
+                if (next == BookingStatus.APPROVED) {
+                    existing.getAsset().setStatus(AssetStatus.IN_USE);
+                    assetRepository.save(existing.getAsset());
+                } else if (next == BookingStatus.REJECTED || next == BookingStatus.COMPLETED) {
+                    existing.getAsset().setStatus(AssetStatus.AVAILABLE);
+                    assetRepository.save(existing.getAsset());
+                }
+            }
         }
         if (booking.getCheckedInAt() != null) existing.setCheckedInAt(booking.getCheckedInAt());
         if (booking.getCheckedOutAt() != null) existing.setCheckedOutAt(booking.getCheckedOutAt());
@@ -102,8 +126,15 @@ public class BookingService {
 
     @Transactional
     public boolean delete(Long id) {
-        if (!bookingRepository.existsById(id)) return false;
+        Booking existing = bookingRepository.findById(id).orElse(null);
+        if (existing == null) return false;
         bookingRepository.deleteById(id);
+
+        // If a pending booking is removed, make the asset available again.
+        if (existing.getStatus() == BookingStatus.PENDING && existing.getAsset() != null) {
+            existing.getAsset().setStatus(AssetStatus.AVAILABLE);
+            assetRepository.save(existing.getAsset());
+        }
         return true;
     }
 
