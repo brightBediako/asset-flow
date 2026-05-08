@@ -4,11 +4,14 @@ import apiClient from '@/api/client';
 import { Badge, Button } from '@/components/ui/BaseComponents';
 import { MapPin, Tag, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 export default function PublicAssets() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [params, setParams] = useState({ page: 0, size: 12, q: '', status: 'AVAILABLE' });
   const [selectedAsset, setSelectedAsset] = useState(null);
+  const [brokenImages, setBrokenImages] = useState(() => new Set());
 
   const { data, isLoading } = useQuery({
     queryKey: ['public-assets', params],
@@ -59,17 +62,25 @@ export default function PublicAssets() {
                    className="flex flex-col bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden group hover:shadow-xl hover:border-indigo-200 transition-all duration-300"
                  >
                    <div className="aspect-video bg-slate-100 relative overflow-hidden">
-                      {asset.imageUrl ? (
+                      {asset.imageUrl && !brokenImages.has(asset.id) ? (
                         <img
                           src={asset.imageUrl}
                           alt={asset.name}
                           className="absolute inset-0 w-full h-full object-cover"
+                          onError={() =>
+                            setBrokenImages((prev) => {
+                              const next = new Set(prev);
+                              next.add(asset.id);
+                              return next;
+                            })
+                          }
                         />
-                      ) : null}
+                      ) : (
                       <div className="absolute inset-0 flex items-center justify-center text-slate-200">
                          <Box className="h-16 w-16" />
                       </div>
-                      {asset.imageUrl ? <div className="absolute inset-0 bg-slate-900/10" /> : null}
+                      )}
+                      {asset.imageUrl && !brokenImages.has(asset.id) ? <div className="absolute inset-0 bg-slate-900/10" /> : null}
                       <div className="absolute top-4 left-4">
                         <Badge status={asset.status}>{asset.status}</Badge>
                       </div>
@@ -95,7 +106,11 @@ export default function PublicAssets() {
                         </Button>
                         <Button
                           onClick={() => {
-                            navigate(`/login?redirect=${encodeURIComponent('/app/my-bookings')}`);
+                            if (isAuthenticated) {
+                              navigate(`/app/book?assetId=${asset.id}`);
+                              return;
+                            }
+                            navigate(`/login?redirect=${encodeURIComponent(`/app/book?assetId=${asset.id}`)}`);
                           }}
                         >
                           Book
@@ -142,6 +157,19 @@ export default function PublicAssets() {
               >
                 <X className="h-5 w-5" />
               </button>
+            </div>
+            <div className="aspect-video bg-slate-100 relative overflow-hidden">
+              {selectedAsset.imageUrl ? (
+                <img
+                  src={selectedAsset.imageUrl}
+                  alt={selectedAsset.name}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-slate-200">
+                  <Box className="h-16 w-16" />
+                </div>
+              )}
             </div>
             <div className="p-6 space-y-3 text-sm">
               <p><span className="font-bold text-slate-700">Name:</span> {selectedAsset.name}</p>

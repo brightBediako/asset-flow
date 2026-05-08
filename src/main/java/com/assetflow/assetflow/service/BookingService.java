@@ -59,6 +59,9 @@ public class BookingService {
 
     @Transactional
     public Booking create(Booking booking) {
+        if (booking.getStatus() == null) {
+            booking.setStatus(BookingStatus.PENDING);
+        }
         if (booking.getOrganization() != null && booking.getOrganization().getId() != null) {
             booking.setOrganization(organizationRepository.findById(booking.getOrganization().getId()).orElseThrow());
         }

@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Box, Lock, Mail } from 'lucide-react';
+import { Box } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button, Input, Card } from '@/components/ui/BaseComponents';
 import toast from 'react-hot-toast';
@@ -14,33 +14,37 @@ const schema = yup.object().shape({
 });
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get('redirect') || '/app';
+
+  useEffect(() => {
+    if (loading) return;
+    if (isAuthenticated) {
+      navigate(redirect, { replace: true });
+    }
+  }, [isAuthenticated, loading, navigate, redirect]);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: yupResolver(schema),
   });
 
   const onSubmit = async (data) => {
-    try {
-      const user = await login(data);
-      toast.success(`Welcome back, ${user.name}!`);
-      
-      // Role-aware initial redirect if no explicit redirect param
-      if (!searchParams.get('redirect')) {
-        if (user.role === 'USER') {
-          navigate('/app/profile');
-        } else {
-          navigate('/app');
-        }
+    const user = await login(data);
+    toast.success(`Welcome back, ${user.name}!`);
+
+    // Role-aware initial redirect if no explicit redirect param
+    if (!searchParams.get('redirect')) {
+      if (user.role === 'USER') {
+        navigate('/app/profile');
       } else {
-        navigate(redirect);
+        navigate('/app');
       }
-    } catch (error) {
-      // Errors handled by axios interceptor
+      return;
     }
+
+    navigate(redirect);
   };
 
   return (
@@ -82,7 +86,9 @@ export default function Login() {
                 <label htmlFor="remember-me" className="ml-2 block text-xs font-bold text-[#64748B] uppercase tracking-wider">Keep Logged In</label>
               </div>
               <div className="text-xs">
-                <a href="#" className="font-bold text-[#2563EB] hover:text-blue-700 uppercase tracking-wider">Forgot Password?</a>
+                <button type="button" className="font-bold text-[#2563EB] hover:text-blue-700 uppercase tracking-wider">
+                  Forgot Password?
+                </button>
               </div>
             </div>
             <Button type="submit" className="w-full h-12 text-sm uppercase tracking-widest font-black" isLoading={isSubmitting}>

@@ -40,6 +40,12 @@ public class OrganizationService {
         if (organization.getLocation() != null) {
             organization.setLocation(organization.getLocation().trim());
         }
+        if (organization.getContactEmail() != null) {
+            organization.setContactEmail(organization.getContactEmail().trim());
+        }
+        if (organization.getContactPhoneNumber() != null) {
+            organization.setContactPhoneNumber(organization.getContactPhoneNumber().trim());
+        }
         return organizationRepository.save(organization);
     }
 
@@ -52,6 +58,12 @@ public class OrganizationService {
         }
         if (organization.getLocation() != null) {
             existing.setLocation(organization.getLocation().trim());
+        }
+        if (organization.getContactEmail() != null) {
+            existing.setContactEmail(organization.getContactEmail().trim());
+        }
+        if (organization.getContactPhoneNumber() != null) {
+            existing.setContactPhoneNumber(organization.getContactPhoneNumber().trim());
         }
         return organizationRepository.save(existing);
     }

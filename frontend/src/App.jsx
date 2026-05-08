@@ -19,6 +19,7 @@ import Assets from './pages/app/assets/AssetList.jsx';
 import Categories from './pages/app/categories/CategoryList.jsx';
 import Bookings from './pages/app/bookings/BookingList.jsx';
 import MyBookings from './pages/app/bookings/MyBookings.jsx';
+import BookAsset from './pages/app/bookings/BookAsset.jsx';
 import Maintenance from './pages/app/maintenance/MaintenanceList.jsx';
 import AuditLogs from './pages/app/audit/AuditLogs.jsx';
 import Profile from './pages/app/Profile.jsx';
@@ -96,6 +97,12 @@ export default function App() {
           <Route path="my-bookings" element={
             <ProtectedRoute allowedRoles={[ROLES.USER]}>
               <MyBookings />
+            </ProtectedRoute>
+          } />
+
+          <Route path="book" element={
+            <ProtectedRoute allowedRoles={[ROLES.USER]}>
+              <BookAsset />
             </ProtectedRoute>
           } />
 

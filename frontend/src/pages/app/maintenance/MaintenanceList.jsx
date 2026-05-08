@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
 import ListLayout from '@/components/common/ListLayout';
@@ -13,14 +13,22 @@ export default function MaintenanceList() {
   const queryClient = useQueryClient();
   const [params, setParams] = useState({ page: 0, size: 10, q: '' });
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({
-    organizationId: '',
-    assetId: '',
-    description: '',
-  });
 
   const isOrgAdmin = user?.role === 'ORG_ADMIN';
   const defaultOrganizationId = user?.organization?.id ? String(user.organization.id) : '';
+  const [form, setForm] = useState(() => ({
+    organizationId: defaultOrganizationId,
+    assetId: '',
+    description: '',
+  }));
+
+  useEffect(() => {
+    if (!showForm) return;
+    // Default organization to the current user's organization when available.
+    if (defaultOrganizationId && !form.organizationId) {
+      setForm((prev) => ({ ...prev, organizationId: defaultOrganizationId }));
+    }
+  }, [showForm, defaultOrganizationId, form.organizationId]);
 
   const { data: records = [], isLoading } = useQuery({
     queryKey: ['maintenance', params],
@@ -71,7 +79,7 @@ export default function MaintenanceList() {
       toast.success('Maintenance record created');
       queryClient.invalidateQueries({ queryKey: ['maintenance'] });
       setShowForm(false);
-      setForm({ organizationId: isOrgAdmin ? defaultOrganizationId : '', assetId: '', description: '' });
+      setForm({ organizationId: defaultOrganizationId, assetId: '', description: '' });
     },
   });
 
@@ -107,6 +115,20 @@ export default function MaintenanceList() {
     () => (assetsQuery.data || []).map((asset) => ({ label: asset.name, value: String(asset.id) })),
     [assetsQuery.data]
   );
+
+  const selectedAsset = useMemo(() => {
+    if (!form.assetId) return null;
+    return (assetsQuery.data || []).find((a) => String(a.id) === String(form.assetId)) || null;
+  }, [assetsQuery.data, form.assetId]);
+
+  useEffect(() => {
+    // If an asset is chosen, auto-select its owning organization.
+    if (!selectedAsset?.organization?.id) return;
+    const ownerOrgId = String(selectedAsset.organization.id);
+    if (ownerOrgId && ownerOrgId !== form.organizationId) {
+      setForm((prev) => ({ ...prev, organizationId: ownerOrgId }));
+    }
+  }, [selectedAsset?.organization?.id, form.organizationId]);
 
   const submitCreate = (e) => {
     e.preventDefault();
@@ -201,12 +223,24 @@ export default function MaintenanceList() {
         <Card title="Schedule Maintenance">
           <form className="space-y-4" onSubmit={submitCreate}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Scheduled by"
+                value={user?.fullName || user?.name || user?.email || ''}
+                disabled
+              />
+              <Input
+                label="Asset Owner (Organization)"
+                value={selectedAsset?.organization?.name || user?.organization?.name || ''}
+                disabled
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Select
                 label="Organization"
                 value={form.organizationId}
                 onChange={(e) => setForm((prev) => ({ ...prev, organizationId: e.target.value, assetId: '' }))}
                 options={[{ label: 'Select organization', value: '' }, ...organizationOptions]}
-                disabled={isOrgAdmin}
+                disabled={isOrgAdmin || Boolean(selectedAsset?.organization?.id)}
               />
               <Select
                 label="Asset"

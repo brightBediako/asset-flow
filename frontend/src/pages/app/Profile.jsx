@@ -15,6 +15,9 @@ export default function Profile() {
     jobTitle: '',
     phoneNumber: '',
     organizationName: '',
+    organizationLocation: '',
+    organizationContactEmail: '',
+    organizationContactPhoneNumber: '',
   });
 
   useEffect(() => {
@@ -25,6 +28,9 @@ export default function Profile() {
       jobTitle: user.jobTitle || '',
       phoneNumber: user.phoneNumber || '',
       organizationName: user.organization?.name || '',
+      organizationLocation: user.organization?.location || '',
+      organizationContactEmail: user.organization?.contactEmail || '',
+      organizationContactPhoneNumber: user.organization?.contactPhoneNumber || '',
     });
   }, [user]);
 
@@ -51,6 +57,9 @@ export default function Profile() {
         requests.push(
           apiClient.put(`/organizations/${user.organization.id}`, {
             name: form.organizationName.trim(),
+            location: form.organizationLocation.trim() || null,
+            contactEmail: form.organizationContactEmail.trim() || null,
+            contactPhoneNumber: form.organizationContactPhoneNumber.trim() || null,
           })
         );
       }
@@ -150,6 +159,29 @@ export default function Profile() {
                        onChange={(e) => setForm((prev) => ({ ...prev, organizationName: e.target.value }))}
                        disabled={!user.organization?.id}
                      />
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                       <Input
+                         label="Location"
+                         value={form.organizationLocation}
+                         onChange={(e) => setForm((prev) => ({ ...prev, organizationLocation: e.target.value }))}
+                         disabled={!user.organization?.id}
+                         placeholder="e.g. Accra"
+                       />
+                       <Input
+                         label="Contact Email"
+                         value={form.organizationContactEmail}
+                         onChange={(e) => setForm((prev) => ({ ...prev, organizationContactEmail: e.target.value }))}
+                         disabled={!user.organization?.id}
+                         placeholder="e.g. accounts@org.com"
+                       />
+                       <Input
+                         label="Contact Phone"
+                         value={form.organizationContactPhoneNumber}
+                         onChange={(e) => setForm((prev) => ({ ...prev, organizationContactPhoneNumber: e.target.value }))}
+                         disabled={!user.organization?.id}
+                         placeholder="e.g. 0241234567"
+                       />
+                     </div>
                      <p className="text-xs text-slate-500 font-medium mt-1">
                        Member ID: {user.organization?.id || 'SEC-0000'}
                      </p>

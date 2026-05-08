@@ -24,6 +24,12 @@ public class Organization {
     @Column(length = 255)
     private String location;
 
+    @Column(name = "contact_email", length = 255)
+    private String contactEmail;
+
+    @Column(name = "contact_phone_number", length = 40)
+    private String contactPhoneNumber;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
