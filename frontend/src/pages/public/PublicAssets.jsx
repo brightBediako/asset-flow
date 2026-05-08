@@ -55,8 +55,10 @@ export default function PublicAssets() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-               {data?.content?.map((asset) => (
-                 <motion.div 
+               {data?.content?.map((asset) => {
+                 const bookable = asset.status === 'AVAILABLE';
+                 return (
+                 <motion.div
                    key={asset.id}
                    whileHover={{ y: -4 }}
                    className="flex flex-col bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden group hover:shadow-xl hover:border-indigo-200 transition-all duration-300"
@@ -105,7 +107,9 @@ export default function PublicAssets() {
                           View Details
                         </Button>
                         <Button
+                          disabled={!bookable}
                           onClick={() => {
+                            if (!bookable) return;
                             if (isAuthenticated) {
                               navigate(`/app/book?assetId=${asset.id}`);
                               return;
@@ -113,12 +117,13 @@ export default function PublicAssets() {
                             navigate(`/login?redirect=${encodeURIComponent(`/app/book?assetId=${asset.id}`)}`);
                           }}
                         >
-                          Book
+                          {bookable ? 'Book' : 'Unavailable'}
                         </Button>
                       </div>
                    </div>
                  </motion.div>
-               ))}
+                 );
+               })}
                {!data?.content?.length && (
                  <div className="col-span-full py-20 text-center">
                     <p className="text-slate-400 font-medium">No assets matching your search criteria.</p>

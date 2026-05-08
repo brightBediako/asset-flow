@@ -1,12 +1,16 @@
 package com.assetflow.assetflow.controller;
 
 import com.assetflow.assetflow.entity.Organization;
+import com.assetflow.assetflow.entity.User;
 import com.assetflow.assetflow.service.OrganizationService;
+import com.assetflow.assetflow.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +21,7 @@ import java.util.List;
 public class OrganizationController {
 
     private final OrganizationService organizationService;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<List<Organization>> list() {
@@ -44,7 +49,10 @@ public class OrganizationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Organization> update(@PathVariable Long id, @RequestBody Organization organization) {
+    public ResponseEntity<Organization> update(@PathVariable Long id, @RequestBody Organization organization, Authentication authentication) {
+        if (!isSuperAdmin(authentication) && !isCurrentUsersOrganization(authentication, id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         Organization updated = organizationService.update(id, organization);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
@@ -52,5 +60,20 @@ public class OrganizationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         return organizationService.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    private boolean isSuperAdmin(Authentication authentication) {
+        if (authentication == null) return false;
+        return authentication.getAuthorities().stream().anyMatch(a -> "SUPER_ADMIN".equals(a.getAuthority()));
+    }
+
+    private boolean isCurrentUsersOrganization(Authentication authentication, Long organizationId) {
+        if (authentication == null || authentication.getName() == null || organizationId == null) {
+            return false;
+        }
+        User current = userService.findByEmail(authentication.getName());
+        return current != null
+                && current.getOrganization() != null
+                && organizationId.equals(current.getOrganization().getId());
     }
 }

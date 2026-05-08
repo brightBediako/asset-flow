@@ -41,6 +41,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/roles", "/api/roles/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/users", "/api/users/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/organizations", "/api/organizations/**").authenticated()
+                        // Profile page: allow updating *own* organization (controller enforces ownership)
+                        .requestMatchers(HttpMethod.PUT, "/api/organizations/*").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/users/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/assets/**").hasAnyAuthority("SUPER_ADMIN", "ORG_ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/assets/**").hasAnyAuthority("SUPER_ADMIN", "ORG_ADMIN")
