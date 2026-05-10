@@ -1,6 +1,7 @@
 package com.assetflow.assetflow.service;
 
 import com.assetflow.assetflow.entity.AssetCategory;
+import com.assetflow.assetflow.exception.FieldValidationException;
 import com.assetflow.assetflow.repository.AssetCategoryRepository;
 import com.assetflow.assetflow.repository.OrganizationRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +35,30 @@ public class AssetCategoryService {
 
     @Transactional
     public AssetCategory create(AssetCategory category) {
-        if (category.getOrganization() != null && category.getOrganization().getId() != null) {
-            category.setOrganization(organizationRepository.findById(category.getOrganization().getId()).orElseThrow());
+        if (category.getName() == null || category.getName().isBlank()) {
+            throw new FieldValidationException("Category name is required.", Map.of("name", "Required"));
         }
+        category.setName(category.getName().trim());
+
+        if (category.getOrganization() != null && category.getOrganization().getId() != null) {
+            Long orgId = category.getOrganization().getId();
+            category.setOrganization(organizationRepository.findById(orgId).orElseThrow());
+            assetCategoryRepository.findByOrganizationIdAndName(orgId, category.getName())
+                    .ifPresent(c -> {
+                        throw new FieldValidationException(
+                                "A category with this name already exists for this organization.",
+                                Map.of("name", "Duplicate category name for organization"));
+                    });
+        } else {
+            category.setOrganization(null);
+            assetCategoryRepository.findByOrganizationIsNullAndName(category.getName())
+                    .ifPresent(c -> {
+                        throw new FieldValidationException(
+                                "A global category with this name already exists.",
+                                Map.of("name", "Duplicate global category name"));
+                    });
+        }
+
         return assetCategoryRepository.save(category);
     }
 

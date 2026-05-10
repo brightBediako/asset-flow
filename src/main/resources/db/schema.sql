@@ -48,7 +48,7 @@ CREATE INDEX IF NOT EXISTS idx_user_role_id ON "user"(role_id);
 -- Asset categories (per organization)
 CREATE TABLE IF NOT EXISTS asset_category (
     id              BIGSERIAL PRIMARY KEY,
-    organization_id BIGINT NOT NULL REFERENCES organization(id) ON DELETE CASCADE,
+    organization_id BIGINT REFERENCES organization(id) ON DELETE CASCADE,
     name            VARCHAR(100) NOT NULL,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE(organization_id, name)

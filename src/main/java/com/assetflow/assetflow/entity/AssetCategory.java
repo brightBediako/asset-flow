@@ -21,7 +21,7 @@ public class AssetCategory {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "organization_id")
+    @JoinColumn(name = "organization_id", nullable = true)
     private Organization organization;
 
     @Column(nullable = false, length = 100)

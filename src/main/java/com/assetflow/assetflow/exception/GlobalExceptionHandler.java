@@ -65,8 +65,10 @@ public class GlobalExceptionHandler {
         if (lower.contains("duplicate key") && lower.contains("(email)")) {
             normalizedMessage = "An account with this email already exists.";
             details.put("email", "Email already exists");
-        } else if (lower.contains("duplicate key")) {
+        } else if (lower.contains("duplicate key") || lower.contains("unique constraint")) {
             normalizedMessage = "A record with this value already exists.";
+        } else if (lower.contains("not-null") || lower.contains("not null violation")) {
+            normalizedMessage = "Required data is missing or invalid.";
         }
 
         Map<String, Object> body = new HashMap<>();

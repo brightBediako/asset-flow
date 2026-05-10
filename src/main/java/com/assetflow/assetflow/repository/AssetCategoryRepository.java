@@ -20,4 +20,6 @@ public interface AssetCategoryRepository extends JpaRepository<AssetCategory, Lo
     List<AssetCategory> findGlobalAndOrganizationCategories(Long organizationId);
 
     Optional<AssetCategory> findByOrganizationIdAndName(Long organizationId, String name);
+
+    Optional<AssetCategory> findByOrganizationIsNullAndName(String name);
 }
