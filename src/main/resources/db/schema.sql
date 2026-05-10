@@ -39,7 +39,10 @@ CREATE TABLE IF NOT EXISTS "user" (
 CREATE INDEX IF NOT EXISTS idx_user_organization_id ON "user"(organization_id);
 CREATE INDEX IF NOT EXISTS idx_user_role_id ON "user"(role_id);
 
--- Asset categories (per organization)
+-- Asset categories: organization-scoped (organization_id set) or global (organization_id NULL).
+-- SUPER_ADMIN creates global categories; NOT NULL on this column breaks that flow.
+-- If your database was created with organization_id NOT NULL, run once:
+--   ALTER TABLE asset_category ALTER COLUMN organization_id DROP NOT NULL;
 CREATE TABLE IF NOT EXISTS asset_category (
     id              BIGSERIAL PRIMARY KEY,
     organization_id BIGINT REFERENCES organization(id) ON DELETE CASCADE,
