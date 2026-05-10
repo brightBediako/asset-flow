@@ -38,7 +38,7 @@ export default function ListLayout({
              <input 
                 type="text" 
                 placeholder={searchPlaceholder}
-                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-lg text-[13px] font-medium focus:ring-4 focus:ring-blue-100 focus:border-[#2563EB] focus:outline-none transition-all placeholder:text-slate-400"
+                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-lg text-[13px] font-medium focus:ring-4 focus:ring-accent/20 focus:border-accent focus:outline-none transition-all placeholder:text-slate-400"
                 onChange={(e) => onSearch?.(e.target.value)}
              />
           </div>
@@ -127,7 +127,7 @@ export default function ListLayout({
                         onClick={() => onPageChange?.(i)}
                         className={cn(
                           "h-8 w-8 text-[11px] font-black rounded-lg transition-all",
-                          pagination.number === i ? "bg-[#2563EB] text-white shadow-lg shadow-blue-200" : "text-[#64748B] hover:bg-slate-200"
+                          pagination.number === i ? "bg-accent text-white shadow-lg shadow-accent/30" : "text-[#64748B] hover:bg-slate-200"
                         )}
                       >
                         {i + 1}

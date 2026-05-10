@@ -68,7 +68,7 @@ export default function OrganizationList() {
       header: 'Organization',
       cell: (row) => (
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 flex-shrink-0 bg-blue-50 rounded-xl flex items-center justify-center text-[#2563EB]">
+          <div className="h-10 w-10 flex-shrink-0 bg-accent-muted rounded-xl flex items-center justify-center text-accent">
             <Building2 className="h-5 w-5" />
           </div>
           <div className="flex flex-col">

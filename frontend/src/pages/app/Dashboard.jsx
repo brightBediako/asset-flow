@@ -91,7 +91,7 @@ export default function Dashboard() {
           title="Active Users" 
           value={stats?.activeUsers} 
           icon={Users} 
-          colorClass="bg-blue-50 text-blue-600"
+          colorClass="bg-accent-muted text-accent"
         />
         <StatCard 
           title="Current Bookings" 
@@ -143,22 +143,22 @@ export default function Dashboard() {
 
         <Card title="Quick Actions" subtitle="Frequently used administrative tasks">
            <div className="grid grid-cols-1 gap-2.5">
-              <Button variant="outline" className="justify-start gap-3 h-11 border-slate-200 hover:border-[#2563EB] hover:bg-blue-50/50">
-                 <Box className="h-4 w-4 text-[#2563EB]" /> Add New Asset
+              <Button variant="outline" className="justify-start gap-3 h-11 border-slate-200 hover:border-accent hover:bg-accent-muted/80">
+                 <Box className="h-4 w-4 text-accent" /> Add New Asset
               </Button>
-              <Button variant="outline" className="justify-start gap-3 h-11 border-slate-200 hover:border-[#2563EB] hover:bg-blue-50/50">
-                 <Users className="h-4 w-4 text-[#2563EB]" /> Onboard User
+              <Button variant="outline" className="justify-start gap-3 h-11 border-slate-200 hover:border-accent hover:bg-accent-muted/80">
+                 <Users className="h-4 w-4 text-accent" /> Onboard User
               </Button>
-              <Button variant="outline" className="justify-start gap-3 h-11 border-slate-200 hover:border-[#2563EB] hover:bg-blue-50/50">
-                 <Wrench className="h-4 w-4 text-[#2563EB]" /> Record Maintenance
+              <Button variant="outline" className="justify-start gap-3 h-11 border-slate-200 hover:border-accent hover:bg-accent-muted/80">
+                 <Wrench className="h-4 w-4 text-accent" /> Record Maintenance
               </Button>
-              <Button variant="outline" className="justify-start gap-3 h-11 border-slate-200 hover:border-[#2563EB] hover:bg-blue-50/50">
-                 <CalendarCheck className="h-4 w-4 text-[#2563EB]" /> Review Bookings
+              <Button variant="outline" className="justify-start gap-3 h-11 border-slate-200 hover:border-accent hover:bg-accent-muted/80">
+                 <CalendarCheck className="h-4 w-4 text-accent" /> Review Bookings
               </Button>
            </div>
-           <div className="mt-8 bg-[#2563EB] rounded-xl p-6 text-white overflow-hidden relative shadow-lg shadow-blue-500/20">
+           <div className="mt-8 bg-accent rounded-xl p-6 text-white overflow-hidden relative shadow-lg shadow-accent/30">
               <div className="relative z-10">
-                <p className="text-blue-100 text-[10px] font-black uppercase tracking-widest mb-2">Usage Insights</p>
+                <p className="text-white/80 text-[10px] font-black uppercase tracking-widest mb-2">Usage Insights</p>
                 <h5 className="text-xl font-black mb-4 leading-tight tracking-tight">Utilization is up by 24% this week.</h5>
                 <Button variant="secondary" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm border-none shadow-none">View Detailed Report</Button>
               </div>

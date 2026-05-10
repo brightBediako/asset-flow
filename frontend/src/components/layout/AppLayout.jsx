@@ -99,7 +99,7 @@ export default function AppLayout() {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex w-60 flex-col fixed inset-y-0 z-40 bg-[#1E293B] border-r border-slate-800">
         <div className="flex items-center gap-3 px-8 h-16 border-b border-slate-800">
-          <div className="bg-[#2563EB] p-1.5 rounded-lg shadow-lg shadow-blue-500/20">
+          <div className="bg-accent p-1.5 rounded-lg shadow-lg shadow-accent/25">
             <Box className="h-5 w-5 text-white" />
           </div>
           <span className="text-xl font-black text-white tracking-tight">AssetFlow</span>
@@ -113,13 +113,13 @@ export default function AppLayout() {
               className={cn(
                 "group flex items-center gap-3 px-8 py-3.5 text-[13px] font-bold transition-all duration-200 border-l-4",
                 isActive(item.href)
-                  ? "bg-white/5 text-white border-[#2563EB]"
+                  ? "bg-white/5 text-white border-accent"
                   : "text-[#94A3B8] border-transparent hover:text-white hover:bg-white/5"
               )}
             >
               <item.icon className={cn(
                 "h-4 w-4 transition-colors",
-                isActive(item.href) ? "text-[#2563EB]" : "text-[#94A3B8] group-hover:text-white"
+                isActive(item.href) ? "text-accent" : "text-[#94A3B8] group-hover:text-white"
               )} />
               {item.name}
             </Link>
@@ -128,7 +128,7 @@ export default function AppLayout() {
 
         <div className="p-4 border-t border-slate-800">
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 group transition-colors">
-            <div className="h-8 w-8 rounded-full bg-[#2563EB] flex items-center justify-center text-white text-xs font-black shadow-lg shadow-blue-500/20">
+            <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center text-white text-xs font-black shadow-lg shadow-accent/25">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
@@ -170,7 +170,7 @@ export default function AppLayout() {
           </div>
 
           <div className="flex items-center gap-4">
-              <button className="relative p-2 text-slate-400 hover:text-[#2563EB] hover:bg-blue-50 rounded-lg transition-colors">
+              <button className="relative p-2 text-slate-400 hover:text-accent hover:bg-accent-muted rounded-lg transition-colors">
                  <Bell className="h-5 w-5" />
                  <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
               </button>
@@ -181,7 +181,7 @@ export default function AppLayout() {
                       <p className="text-[10px] uppercase tracking-wider font-bold text-slate-400 mt-1">{user.organization?.name || 'Independent'}</p>
                   </div>
                   <Link to="/app/profile">
-                    <div className="h-9 w-9 rounded-lg bg-[#2563EB] flex items-center justify-center text-white text-sm font-black shadow-lg shadow-blue-200">
+                    <div className="h-9 w-9 rounded-lg bg-accent flex items-center justify-center text-white text-sm font-black shadow-lg shadow-accent/30">
                       {user.name.charAt(0).toUpperCase()}
                     </div>
                   </Link>
@@ -214,7 +214,7 @@ export default function AppLayout() {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={cn(
                         "flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl",
-                        isActive(item.href) ? "bg-indigo-50 text-indigo-700" : "text-slate-600"
+                        isActive(item.href) ? "bg-accent-muted text-accent" : "text-slate-600"
                       )}
                     >
                       <item.icon className="h-5 w-5" />

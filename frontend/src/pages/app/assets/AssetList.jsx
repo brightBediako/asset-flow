@@ -319,7 +319,7 @@ export default function AssetList() {
                 id="asset-image-file"
                 type="file"
                 accept="image/*"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm transition-all duration-200 focus:border-[#2563EB] focus:ring-4 focus:ring-blue-100 focus:outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm transition-all duration-200 focus:border-accent focus:ring-4 focus:ring-accent/20 focus:outline-none"
                 onChange={(e) =>
                   setForm((prev) => ({
                     ...prev,
@@ -332,7 +332,7 @@ export default function AssetList() {
               <label htmlFor="asset-description" className="text-sm font-medium text-gray-700">Description</label>
               <textarea
                 id="asset-description"
-                className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm transition-all duration-200 focus:border-[#2563EB] focus:ring-4 focus:ring-blue-100 focus:outline-none"
+                className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm transition-all duration-200 focus:border-accent focus:ring-4 focus:ring-accent/20 focus:outline-none"
                 rows={3}
                 value={form.description}
                 onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}

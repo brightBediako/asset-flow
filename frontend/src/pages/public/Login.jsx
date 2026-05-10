@@ -52,7 +52,7 @@ export default function Login() {
       <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in-95 duration-500">
         <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-2 mb-8 group">
-            <div className="bg-[#2563EB] p-2 rounded-xl group-hover:rotate-12 transition-transform duration-300 shadow-lg shadow-blue-500/20">
+            <div className="bg-accent p-2 rounded-xl group-hover:rotate-12 transition-transform duration-300 shadow-lg shadow-accent/25">
               <Box className="h-7 w-7 text-white" />
             </div>
             <span className="text-2xl font-black text-[#0F172A] tracking-tighter uppercase italic">AssetFlow</span><p> | System Login</p>
@@ -61,7 +61,7 @@ export default function Login() {
           <p className="mt-2 text-[13px] font-medium text-[#64748B] uppercase tracking-widest">Enterprise Asset Management</p>
         </div>
 
-        <Card className="shadow-[0_20px_50px_rgba(37,99,235,0.05)] border-t-[6px] border-t-[#2563EB] p-2">
+        <Card className="shadow-[0_20px_50px_rgba(120,192,168,0.12)] border-t-[6px] border-t-accent p-2">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <Input
               label="Email Address"
@@ -82,11 +82,11 @@ export default function Login() {
             />
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 rounded border-slate-300 text-[#2563EB] focus:ring-[#2563EB]" />
+                <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 rounded border-slate-300 accent-accent focus:ring-accent" />
                 <label htmlFor="remember-me" className="ml-2 block text-xs font-bold text-[#64748B] uppercase tracking-wider">Keep Logged In</label>
               </div>
               <div className="text-xs">
-                <button type="button" className="font-bold text-[#2563EB] hover:text-blue-700 uppercase tracking-wider">
+                <button type="button" className="font-bold text-accent hover:text-accent-hover uppercase tracking-wider">
                   Forgot Password?
                 </button>
               </div>
@@ -99,7 +99,7 @@ export default function Login() {
 
         <p className="text-center text-xs font-bold text-[#64748B] uppercase tracking-widest">
           New to the floor?{' '}
-          <Link to="/register" className="text-[#2563EB] hover:text-blue-700 underline underline-offset-4">
+          <Link to="/register" className="text-accent hover:text-accent-hover underline underline-offset-4">
             Create Account
           </Link>
         </p>

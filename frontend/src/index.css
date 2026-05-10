@@ -7,7 +7,10 @@
   
   --color-bg-main: #F4F7FA;
   --color-sidebar: #1E293B;
-  --color-accent: #2563EB;
+  /* Brand primary (replaces former blue #2563EB) */
+  --color-accent: #78c0a8;
+  --color-accent-hover: #5fa893;
+  --color-accent-muted: #e8f5f1;
   --color-text-primary: #0F172A;
   --color-text-muted: #64748B;
   --color-border: #E2E8F0;

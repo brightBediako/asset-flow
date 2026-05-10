@@ -20,7 +20,7 @@ export default function AuditLogs() {
   const getActionIcon = (action) => {
     if (action.includes('LOGIN')) return <LogIn className="h-4 w-4 text-emerald-500" />;
     if (action.includes('DELETE')) return <Shield className="h-4 w-4 text-rose-500" />;
-    return <Database className="h-4 w-4 text-blue-500" />;
+    return <Database className="h-4 w-4 text-accent" />;
   };
 
   const columns = [

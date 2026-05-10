@@ -25,9 +25,9 @@ export function Button({
   ...props 
 }) {
   const variants = {
-    primary: 'bg-[#2563EB] text-white hover:bg-blue-700 shadow-sm focus-visible:ring-blue-600',
+    primary: 'bg-accent text-white hover:bg-accent-hover shadow-sm focus-visible:ring-accent',
     secondary: 'bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 shadow-sm focus-visible:ring-slate-400',
-    outline: 'bg-transparent text-[#2563EB] border border-[#2563EB] hover:bg-blue-50 focus-visible:ring-blue-600',
+    outline: 'bg-transparent text-accent border border-accent hover:bg-accent-muted focus-visible:ring-accent',
     ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 focus-visible:ring-slate-400',
     danger: 'bg-rose-600 text-white hover:bg-rose-700 shadow-sm focus-visible:ring-rose-600',
   };
@@ -87,7 +87,7 @@ export function Input({ label, error, className, ...props }) {
       {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
       <input
         className={cn(
-          "w-full rounded-lg border border-slate-200 px-4 py-2 text-sm transition-all duration-200 focus:border-[#2563EB] focus:ring-4 focus:ring-blue-100 focus:outline-none disabled:bg-slate-50 disabled:text-slate-500 placeholder:text-slate-400",
+          "w-full rounded-lg border border-slate-200 px-4 py-2 text-sm transition-all duration-200 focus:border-accent focus:ring-4 focus:ring-accent/20 focus:outline-none disabled:bg-slate-50 disabled:text-slate-500 placeholder:text-slate-400",
           error && "border-rose-500 focus:border-rose-500 focus:ring-rose-100"
         )}
         {...props}
@@ -103,7 +103,7 @@ export function Select({ label, error, options = [], className, ...props }) {
       {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
       <select
         className={cn(
-          "w-full rounded-lg border border-slate-200 px-4 py-2 text-sm transition-all duration-200 focus:border-[#2563EB] focus:ring-4 focus:ring-blue-100 focus:outline-none disabled:bg-slate-50 disabled:text-slate-500",
+          "w-full rounded-lg border border-slate-200 px-4 py-2 text-sm transition-all duration-200 focus:border-accent focus:ring-4 focus:ring-accent/20 focus:outline-none disabled:bg-slate-50 disabled:text-slate-500",
           error && "border-rose-500 focus:border-rose-500 focus:ring-rose-100"
         )}
         {...props}
