@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -7,44 +7,55 @@ import { Box } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button, Input, Card } from '@/components/ui/BaseComponents';
 import toast from 'react-hot-toast';
+import { ROLES } from '@/constants/enums.js';
 
 const schema = yup.object().shape({
   email: yup.string().email('Invalid email').required('Email is required'),
   password: yup.string().min(6, 'Password too short').required('Password is required'),
 });
 
+function defaultAppPathForRole(role) {
+  if (role === ROLES.USER) return '/app/book';
+  return '/app';
+}
+
 export default function Login() {
-  const { login, isAuthenticated, loading } = useAuth();
+  const { login, isAuthenticated, loading, user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/app';
+  const explicitRedirect = searchParams.get('redirect');
+  /** Prevents useEffect from navigating to /app and overriding role-aware login navigation */
+  const loginSubmitHandledRef = useRef(false);
 
   useEffect(() => {
-    if (loading) return;
-    if (isAuthenticated) {
-      navigate(redirect, { replace: true });
+    if (loading || !isAuthenticated) return;
+    if (loginSubmitHandledRef.current) return;
+
+    if (explicitRedirect) {
+      navigate(explicitRedirect, { replace: true });
+      return;
     }
-  }, [isAuthenticated, loading, navigate, redirect]);
+    navigate(defaultAppPathForRole(user?.role), { replace: true });
+  }, [isAuthenticated, loading, user?.role, navigate, explicitRedirect]);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: yupResolver(schema),
   });
 
   const onSubmit = async (data) => {
-    const user = await login(data);
-    toast.success(`Welcome back, ${user.name}!`);
+    loginSubmitHandledRef.current = true;
+    try {
+      const loggedIn = await login(data);
+      toast.success(`Welcome back, ${loggedIn.name}!`);
 
-    // Role-aware initial redirect if no explicit redirect param
-    if (!searchParams.get('redirect')) {
-      if (user.role === 'USER') {
-        navigate('/app/profile');
-      } else {
-        navigate('/app');
+      if (explicitRedirect) {
+        navigate(explicitRedirect, { replace: true });
+        return;
       }
-      return;
+      navigate(defaultAppPathForRole(loggedIn.role), { replace: true });
+    } catch {
+      loginSubmitHandledRef.current = false;
     }
-
-    navigate(redirect);
   };
 
   return (

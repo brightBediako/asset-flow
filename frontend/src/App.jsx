@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './components/auth/ProtectedRoute.jsx';
 import { ROLES } from './constants/enums.js';
+import { useAuth } from './context/AuthContext.jsx';
 
 // Public Pages
 import Home from './pages/public/Home.jsx';
@@ -24,6 +25,28 @@ import Maintenance from './pages/app/maintenance/MaintenanceList.jsx';
 import AuditLogs from './pages/app/audit/AuditLogs.jsx';
 import Profile from './pages/app/Profile.jsx';
 
+/** `/app` dashboard is admin-only; standard users are sent to booking entry */
+function AppHomeRoute() {
+  const { user } = useAuth();
+  if (user?.role === ROLES.USER) {
+    return <Navigate to="/app/book" replace />;
+  }
+  return (
+    <ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ORG_ADMIN]}>
+      <Dashboard />
+    </ProtectedRoute>
+  );
+}
+
+/** Unknown `/app/*` paths: avoid looping USER through admin-only `/app` index */
+function AppCatchAllRedirect() {
+  const { user } = useAuth();
+  if (user?.role === ROLES.USER) {
+    return <Navigate to="/app/book" replace />;
+  }
+  return <Navigate to="/app" replace />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -44,12 +67,8 @@ export default function App() {
           {/* Shared Routes */}
           <Route path="profile" element={<Profile />} />
 
-          {/* Admin Specific Routes */}
-          <Route index element={
-            <ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ORG_ADMIN]}>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
+          {/* Admin dashboard at /app; USER redirected to /app/book */}
+          <Route index element={<AppHomeRoute />} />
           
           <Route path="organizations" element={
             <ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN]}>
@@ -107,7 +126,7 @@ export default function App() {
           } />
 
           {/* Fallback for /app */}
-          <Route path="*" element={<Navigate to="/app" replace />} />
+          <Route path="*" element={<AppCatchAllRedirect />} />
         </Route>
 
         {/* Global Fallback */}

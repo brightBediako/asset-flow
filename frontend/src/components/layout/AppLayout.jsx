@@ -14,7 +14,8 @@ import {
   ChevronRight,
   Menu,
   X,
-  Bell
+  Bell,
+  PlusCircle
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/BaseComponents';
@@ -74,6 +75,12 @@ export default function AppLayout() {
       href: '/app/audit-logs', 
       icon: History, 
       roles: [ROLES.SUPER_ADMIN] 
+    },
+    { 
+      name: 'Book an asset', 
+      href: '/app/book', 
+      icon: PlusCircle, 
+      roles: [ROLES.USER] 
     },
     { 
       name: 'My Bookings', 
