@@ -1,6 +1,4 @@
 -- AssetFlow PostgreSQL schema
--- Synced with JPA entities (Organization, Role, User, AssetCategory, Asset, Booking, MaintenanceRecord, AuditLog).
--- Status columns use VARCHAR to match @Enumerated(EnumType.STRING). Hibernate ddl-auto=update will align similarly.
 
 -- Organizations (tenants)
 CREATE TABLE IF NOT EXISTS organization (
